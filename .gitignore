@@ -11,5 +11,8 @@
 .idea
 *.DotSettings.user
 
+# Gradle
+.gradle
+
 # AWS Toolkit
 aws-logger-errors.txt
