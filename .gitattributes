@@ -4,8 +4,10 @@
 *.gitattributes     text
 *.gitignore         text
 *.md                text
-# unix-y stuff
+# posix
 *.sh                text eol=lf
+# windows
+*.bat               text eol=crlf
 # visual studio
 *.sln               text eol=crlf
 *.csproj            text eol=crlf
