@@ -7,7 +7,7 @@
 # VS Code
 .vscode
 
-# Rider
+# JetBrains
 .idea
 *.DotSettings.user
 
