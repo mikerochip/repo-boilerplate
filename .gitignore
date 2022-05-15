@@ -16,3 +16,6 @@
 
 # AWS Toolkit
 aws-logger-errors.txt
+
+# Mono
+mono_crash*
