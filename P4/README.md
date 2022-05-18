@@ -2,7 +2,7 @@ Do this when you need to install and setup P4V on a new machine, or when you wan
 
 1. Download https://www.perforce.com/downloads/helix-visual-client-p4v
    1. Windows: Check all utilities after running the installer (p4cli, p4admin, etc)
-   1. Mac: Additionally download https://www.perforce.com/downloads/helix-command-line-client-p4
+   1. Mac: Additionally download [this](https://www.perforce.com/downloads/helix-command-line-client-p4) then run [this](https://www.perforce.com/manuals/p4guide/Content/P4Guide/install.unix.html)
 1. You'll need to create a workspace after running the installer (if you haven't already)
 1. Name your workspaces like this: ```<ComputerName>_<RepoName>```, for example: ```MSCHW-PC1_MyRepo```
 1. Open a terminal
