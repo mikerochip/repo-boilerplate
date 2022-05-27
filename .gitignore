@@ -1,6 +1,9 @@
 # MacOS
 .DS_Store
 
+# Windows
+Thumbs.db
+
 # Visual Studio
 .vs
 
