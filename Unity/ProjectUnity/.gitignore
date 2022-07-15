@@ -8,11 +8,23 @@
 /[Uu]ser[Ss]ettings/
 
 # Addressables data generated when building content
+/ServerData
 /Assets/StreamingAssets/aa/
 /Assets/StreamingAssets/aa.meta
-/Assets/AddressableAssetsData/**/addressables_content_state.bin*
 /Assets/AddressableAssetsData/link.xml*
-/ServerData
+/Assets/AddressableAssetsData/**/addressables_content_state.bin*
+# Addressables generates platform folders at the top level (see AddressablesPlatform enum)
+/Assets/AddressableAssetsData/Unknown.meta
+/Assets/AddressableAssetsData/Windows.meta
+/Assets/AddressableAssetsData/OSX.meta
+/Assets/AddressableAssetsData/Linux.meta
+/Assets/AddressableAssetsData/PS4.meta
+/Assets/AddressableAssetsData/Switch.meta
+/Assets/AddressableAssetsData/XboxOne.meta
+/Assets/AddressableAssetsData/WebGL.meta
+/Assets/AddressableAssetsData/iOS.meta
+/Assets/AddressableAssetsData/Android.meta
+/Assets/AddressableAssetsData/WindowsUniversal.meta
 
 # Plugins and packages
 /Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset*
