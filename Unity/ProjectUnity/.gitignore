@@ -12,23 +12,23 @@
 /Assets/StreamingAssets/aa/
 /Assets/StreamingAssets/aa.meta
 /Assets/AddressableAssetsData/link.xml*
-/Assets/AddressableAssetsData/**/addressables_content_state.bin*
-# Addressables generates platform folders at the top level (see AddressablesPlatform enum)
-/Assets/AddressableAssetsData/Unknown.meta
-/Assets/AddressableAssetsData/Windows.meta
-/Assets/AddressableAssetsData/OSX.meta
-/Assets/AddressableAssetsData/Linux.meta
-/Assets/AddressableAssetsData/PS4.meta
-/Assets/AddressableAssetsData/Switch.meta
-/Assets/AddressableAssetsData/XboxOne.meta
-/Assets/AddressableAssetsData/WebGL.meta
-/Assets/AddressableAssetsData/iOS.meta
-/Assets/AddressableAssetsData/Android.meta
-/Assets/AddressableAssetsData/WindowsUniversal.meta
+# Addressables generates platform folders directly underneath AddressableAssetsData.
+# All they contain is addressables_content_state.bin but we have to ignore each platform
+# because of meta files.
+/Assets/AddressableAssetsData/Unknown*
+/Assets/AddressableAssetsData/Windows*
+/Assets/AddressableAssetsData/OSX*
+/Assets/AddressableAssetsData/Linux*
+/Assets/AddressableAssetsData/PS4*
+/Assets/AddressableAssetsData/Switch*
+/Assets/AddressableAssetsData/XboxOne*
+/Assets/AddressableAssetsData/WebGL*
+/Assets/AddressableAssetsData/iOS*
+/Assets/AddressableAssetsData/Android*
+/Assets/AddressableAssetsData/WindowsUniversal*
 
 # Plugins and packages
 /Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset*
-/Assets/Gemserk.Favorites.asset*
 /[Aa]ssets/AssetStoreTools*
 /[Aa]ssets/Plugins/Editor/JetBrains*
 
