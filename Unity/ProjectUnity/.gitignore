@@ -28,12 +28,26 @@
 
 # Plugins and packages
 /Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset*
-/[Aa]ssets/AssetStoreTools*
-/[Aa]ssets/Plugins/Editor/JetBrains*
+/Assets/AssetStoreTools*
+
+# Visual Studio
+.vs/
+.vscode/
+
+# JetBrains Rider
+.idea/
+/Assets/Plugins/Editor/JetBrains*
+*.DotSettings.user
+
+# Mono
+mono_crash*
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
+
+# Recordings can get excessive in size
+/[Rr]ecordings/
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 /[Aa]ssets/AssetStoreTools*
@@ -63,9 +77,6 @@ ExportedObj/
 
 # Unity3D generated file on crash reports
 sysinfo.txt
-
-# Builds
-*.apk
 
 # Crashlytics generated file
 crashlytics-build.properties
