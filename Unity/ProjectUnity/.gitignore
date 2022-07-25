@@ -1,4 +1,10 @@
-# This .gitignore file should be placed at the root of your Unity project directory
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Root ignorable folders
 /Library/
 /Temp/
 /obj/
