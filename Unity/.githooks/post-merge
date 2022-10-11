@@ -2,5 +2,5 @@
 command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\nThis repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting '.git/hooks/post-merge'.\n"; exit 2; }
 git lfs post-merge "$@"
 
-command -v dotnet >/dev/null 2>&1 || { echo >&2 "\ndotnet was not found on your path. Install the .Net SDK first.\n"; exit 2; }
-dotnet Relative/Path/To/Hook/Assembly.dll post-merge "$@"
+command -v pwsh >/dev/null 2>&1 || { echo >&2 "\npwsh was not found on your path. Install PowerShell first.\n"; exit 2; }
+pwsh ProjectTools/GitHooks/DeleteEmptyFolders.ps1

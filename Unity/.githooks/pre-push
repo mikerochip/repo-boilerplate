@@ -1,6 +1,6 @@
 #!/bin/sh
-command -v dotnet >/dev/null 2>&1 || { echo >&2 "\ndotnet was not found on your path. Install the .Net SDK first.\n"; exit 2; }
-dotnet Relative/Path/To/Hook/Assembly.dll pre-push "$@"
+command -v pwsh >/dev/null 2>&1 || { echo >&2 "\npwsh was not found on your path. Install PowerShell first.\n"; exit 2; }
+pwsh ProjectTools/GitHooks/CheckMetaFiles.ps1
 ret=$?
 if [ $ret -ne 0 ]; then
     exit $ret
