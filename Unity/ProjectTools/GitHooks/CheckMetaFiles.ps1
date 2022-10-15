@@ -5,11 +5,13 @@ param(
 )
 
 # import scripts
-. ./Util.ps1
+. ./MetaUtil.ps1
 
 # functions
-function Get-RelativePath($item) {
-    return [System.IO.Path]::GetRelativePath($basePath, $item.FullName)
+function Get-RelativePath([string]$path) {
+    # using this instead of [System.IO.Path]::GetRelativePath() so we get full paths in
+    # case $basePath is not in $path
+    return $path.TrimStart($basePath)
 }
 
 function Get-ItemName([string]$path) {
@@ -17,7 +19,7 @@ function Get-ItemName([string]$path) {
 }
 
 function Test-MetaFiles($path) {
-    Write-Verbose "Test `"$path`""
+    Write-Verbose "Test `"$(Get-RelativePath($path))`""
 
     $dirPaths = New-Object System.Collections.Generic.List[string]
 
@@ -31,7 +33,6 @@ function Test-MetaFiles($path) {
         }
 
         $fullPath = $item.FullName
-        $relativePath = Get-RelativePath($item)
 
         if ($item -like '*.meta') {
             # is this a meta file without a companion item?
@@ -39,7 +40,7 @@ function Test-MetaFiles($path) {
             Write-Verbose "    Companion `"$(Get-ItemName($companionItemPath))`""
 
             if (-not (Test-Path -Path $companionItemPath)) {
-                Write-Host "There is no file or folder for `"$relativePath`""
+                Write-Host "There is no file or folder for `"$(Get-RelativePath($fullPath))`""
                 if (-not $DryRun) {
                     exit 1
                 }
@@ -51,7 +52,7 @@ function Test-MetaFiles($path) {
             Write-Verbose "    Meta `"$(Get-ItemName($metaItemPath))`""
 
             if (-not (Test-Path -Path $metaItemPath -PathType Leaf)) {
-                Write-Host "There is no .meta file for `"$relativePath`""
+                Write-Host "There is no .meta file for `"$(Get-RelativePath($fullPath))`""
                 if (-not $DryRun) {
                     exit 1
                 }
@@ -59,7 +60,7 @@ function Test-MetaFiles($path) {
         }
 
         if (Test-Path $fullPath -PathType Container) {
-            $dirPaths.Add($relativePath)
+            $dirPaths.Add($fullPath)
         }
     }
 
