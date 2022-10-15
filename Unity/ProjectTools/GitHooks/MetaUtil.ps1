@@ -21,6 +21,7 @@ class MetaUtil
 
     [bool]ShouldIgnoreMetaChecks($item)
     {
+        # Unity ignores items ending in ~
         if ($item -like '*~')
         {
             return $true
@@ -32,7 +33,7 @@ class MetaUtil
         return $false
     }
     
-    static [string[]]FindUnityMetaFolders()
+    static [string[]]FindFolderPathsWithMetaFiles()
     {
         return @(
             "ProjectUnity/Assets"

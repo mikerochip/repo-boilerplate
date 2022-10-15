@@ -80,6 +80,6 @@ Set-Location $BasePath
 $metaUtil = [MetaUtil]::new()
 $metaUtil.SetIgnoredFullPathsFromGit($BasePath)
 
-foreach ($path in [MetaUtil]::FindUnityMetaFolders()) {
+foreach ($path in [MetaUtil]::FindFolderPathsWithMetaFiles()) {
     Test-MetaFiles $path
 }
