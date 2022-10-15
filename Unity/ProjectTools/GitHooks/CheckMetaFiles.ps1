@@ -1,17 +1,18 @@
 # support common parameters, mostly Verbose
 [CmdletBinding()]
 param(
+    [string]$BasePath = $pwd,
     [switch]$DryRun = $false
 )
 
 # import scripts
-. ./MetaUtil.ps1
+. $PSScriptRoot/MetaUtil.ps1
 
 # functions
 function Get-RelativePath([string]$path) {
     # using this instead of [System.IO.Path]::GetRelativePath() so we get full paths in
-    # case $basePath is not in $path
-    return $path.TrimStart($basePath)
+    # case $BasePath is not in $path
+    return $path.TrimStart($BasePath)
 }
 
 function Get-ItemName([string]$path) {
@@ -70,12 +71,14 @@ function Test-MetaFiles($path) {
 }
 
 # main block
-$basePath = "$PSScriptRoot/../.."
-Set-Location $basePath
-Write-Verbose "Base Path: `"$(Get-Location)`""
+Write-Verbose "Param `$BasePath: `"$BasePath`""
+$BasePath = [System.IO.Path]::GetFullPath($BasePath)
+Write-Verbose "Full `$BasePath: `"$BasePath`""
+
+Set-Location $BasePath
 
 $metaUtil = [MetaUtil]::new()
-$metaUtil.SetIgnoredFullPathsFromGit($basePath)
+$metaUtil.SetIgnoredFullPathsFromGit($BasePath)
 
 foreach ($path in [MetaUtil]::FindUnityMetaFolders()) {
     Test-MetaFiles $path
