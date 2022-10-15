@@ -26,7 +26,7 @@ function Test-MetaFiles($path) {
 
     $childItems = @(Get-ChildItem $path)
     foreach ($item in $childItems) {
-        Write-Verbose "  Check `"$($item.Name)`""
+        Write-Verbose "  Test `"$($item.Name)`""
 
         if ($metaUtil.ShouldIgnoreMetaChecks($item)) {
             Write-Verbose "    Ignore `"$($item.Name)`""
@@ -38,7 +38,7 @@ function Test-MetaFiles($path) {
         if ($item -like '*.meta') {
             # is this a meta file without a companion item?
             $companionItemPath = $fullPath -replace '.meta$', ''
-            Write-Verbose "    Companion `"$(Get-ItemName($companionItemPath))`""
+            Write-Verbose "    Test-Path `"$(Get-ItemName($companionItemPath))`""
 
             if (-not (Test-Path -Path $companionItemPath)) {
                 Write-Host "There is no file or folder for `"$(Get-RelativePath($fullPath))`""
@@ -50,7 +50,7 @@ function Test-MetaFiles($path) {
         else {
             # is this an item without a meta file?
             $metaItemPath = $fullPath + '.meta'
-            Write-Verbose "    Meta `"$(Get-ItemName($metaItemPath))`""
+            Write-Verbose "    Test-Path `"$(Get-ItemName($metaItemPath))`""
 
             if (-not (Test-Path -Path $metaItemPath -PathType Leaf)) {
                 Write-Host "There is no .meta file for `"$(Get-RelativePath($fullPath))`""

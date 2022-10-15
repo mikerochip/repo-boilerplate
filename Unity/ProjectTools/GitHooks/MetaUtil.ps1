@@ -35,9 +35,14 @@ class MetaUtil
     
     static [string[]]FindFolderPathsWithMetaFiles()
     {
-        return @(
-            "ProjectUnity/Assets"
-            "ProjectShared/Company.Project.Package"
-        )
+        # we need to include the Unity Assets folder and any local/embedded packages
+        # from the manifest.json
+        $manifest = Get-Content 'Packages/manifest.json' | ConvertFrom-Json
+        $manifestPaths = foreach ($property in $manifest.dependencies.PsObject.Properties) {
+            if ($property.Value -like 'file:*') {
+                $property.Value -replace '^file:*', ''
+            }
+        }
+        return @('Assets') + $manifestPaths
     }
 }
