@@ -1,5 +1,5 @@
 
-class Util
+class MetaUtil
 {
     [string[]] $IgnoredFullPaths = @()
 

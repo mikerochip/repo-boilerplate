@@ -8,29 +8,24 @@ param(
 . ./Util.ps1
 
 # functions
-function Get-RelativePath($item)
-{
+function Get-RelativePath($item) {
     return [System.IO.Path]::GetRelativePath($basePath, $item.FullName)
 }
 
-function Get-ItemName([string]$path)
-{
+function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
-function Test-MetaFiles($path)
-{
+function Test-MetaFiles($path) {
     Write-Verbose "Test `"$path`""
 
     $dirPaths = New-Object System.Collections.Generic.List[string]
 
     $childItems = @(Get-ChildItem $path)
-    foreach ($item in $childItems)
-    {
+    foreach ($item in $childItems) {
         Write-Verbose "  Check `"$($item.Name)`""
 
-        if ($gitUtil.ShouldIgnoreMetaChecks($item))
-        {
+        if ($metaUtil.ShouldIgnoreMetaChecks($item)) {
             Write-Verbose "    Ignore `"$($item.Name)`""
             continue
         }
@@ -38,45 +33,37 @@ function Test-MetaFiles($path)
         $fullPath = $item.FullName
         $relativePath = Get-RelativePath($item)
 
-        if ($item -like '*.meta')
-        {
+        if ($item -like '*.meta') {
             # is this a meta file without a companion item?
             $companionItemPath = $fullPath -replace '.meta$', ''
             Write-Verbose "    Companion `"$(Get-ItemName($companionItemPath))`""
 
-            if (-not (Test-Path -Path $companionItemPath))
-            {
+            if (-not (Test-Path -Path $companionItemPath)) {
                 Write-Host "There is no file or folder for `"$relativePath`""
-                if (-not $DryRun)
-                {
+                if (-not $DryRun) {
                     exit 1
                 }
             }
         }
-        else
-        {
+        else {
             # is this an item without a meta file?
             $metaItemPath = $fullPath + '.meta'
             Write-Verbose "    Meta `"$(Get-ItemName($metaItemPath))`""
 
-            if (-not (Test-Path -Path $metaItemPath -PathType Leaf))
-            {
+            if (-not (Test-Path -Path $metaItemPath -PathType Leaf)) {
                 Write-Host "There is no .meta file for `"$relativePath`""
-                if (-not $DryRun)
-                {
+                if (-not $DryRun) {
                     exit 1
                 }
             }
         }
 
-        if (Test-Path $fullPath -PathType Container)
-        {
+        if (Test-Path $fullPath -PathType Container) {
             $dirPaths.Add($relativePath)
         }
     }
 
-    foreach ($dirPath in $dirPaths)
-    {
+    foreach ($dirPath in $dirPaths) {
         Test-MetaFiles $dirPath
     }
 }
@@ -86,13 +73,14 @@ $basePath = "$PSScriptRoot/../.."
 Set-Location $basePath
 Write-Verbose "Base Path: `"$(Get-Location)`""
 
-$gitUtil = [Util]::new()
-$gitUtil.SetGitIgnoredFullPaths($basePath)
+$metaUtil = [MetaUtil]::new()
+$metaUtil.SetGitIgnoredFullPaths($basePath)
+
 Write-Verbose 'Ignore Paths:'
-$gitUtil.IgnoredFullPaths | ForEach-Object {
+$metaUtil.IgnoredFullPaths | ForEach-Object {
     Write-Verbose "  `"$PSItem`""
 }
 
-[Util]::FindUnityMetaFolders() | ForEach-Object {
+[MetaUtil]::FindUnityMetaFolders() | ForEach-Object {
     Test-MetaFiles $PSItem
 }
