@@ -13,7 +13,7 @@ class MetaUtil
                 -replace '/$', ''
 
             Write-Verbose "  `"$fullPath`""
-            
+
             $fullPath
         }
     }
@@ -24,7 +24,7 @@ class MetaUtil
         {
             return $true
         }
-        if ($this.IgnoredFullPaths.Contains($item.FullName))
+        if ($this.IgnoredFullPaths | Where-Object { $item.FullName -like $PSItem })
         {
             return $true
         }
