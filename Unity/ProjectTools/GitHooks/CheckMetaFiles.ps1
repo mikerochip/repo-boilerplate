@@ -1,63 +1,69 @@
+# support common parameters, mostly Verbose
+[CmdletBinding()]
+param()
+
+# import scripts
 . ./Util.ps1
 
-$Main =
+# functions
+function Get-RelativePath($item)
 {
-    Write-Output '`nIgnored Files:'
-    [Util]::GetGitIgnoredFilePaths()
-    Write-Output '`nUnity Paths:'
-    [Util]::FindUnityMetaFolders() | ForEach-Object | Test-MetaFiles
-    Test-Exit
+    return [System.IO.Path]::GetRelativePath($basePath, $item.FullName)
 }
 
-function Test-Exit
+function Get-ItemName([string]$path)
 {
-    Write-Output 'Can I finish before I...'
-    exit 1
-    Write-Output 'Exit?'
+    return [System.IO.Path]::GetFileName($path)
 }
 
 function Test-MetaFiles($path)
 {
-    Write-Verbose "Test " $path
+    Write-Verbose "Test `"$path`""
 
-    $ignoredFilePaths = [Util]::GetGitIgnoredFilePaths()
-    $childItems = @(Get-ChildItem $path)
     $dirPaths = New-Object System.Collections.Generic.List[string]
 
+    $childItems = @(Get-ChildItem $path)
     foreach ($item in $childItems)
     {
-        Write-Verbose "Check " $item.Name
+        Write-Verbose "  Check `"$($item.Name)`""
 
-        if ($ignoredFilePaths | Where-Object {$item -like $PSItem})
+        if ($gitUtil.ShouldIgnoreMetaChecks($item))
         {
-            Write-Verbose "Ignore " $item.Name
+            Write-Verbose "    Ignore `"$($item.Name)`""
             continue
         }
 
-        if ($item -like '*.meta$')
+        $fullPath = $item.FullName
+        $relativePath = Get-RelativePath($item)
+
+        if ($item -like '*.meta')
         {
-            # is this a meta file without an item?
-            $nonMetaItemPath = $ite.FullName -replace '.meta$', ''
-            if (-not (Test-Path -Path $nonMetaItemPath))
+            # is this a meta file without a companion item?
+            $companionItemPath = $fullPath -replace '.meta$', ''
+            Write-Verbose "    Companion `"$(Get-ItemName($companionItemPath))`""
+
+            if (-not (Test-Path -Path $companionItemPath))
             {
-                Write-Error "There is no file or folder for `"$($item.FullName)`""
-                exit 1
+                Write-Host "There is no file or folder for `"$relativePath`""
+                #exit 1
             }
         }
         else
         {
             # is this an item without a meta file?
-            $metaItemPath = $item.FullName + '.meta'
+            $metaItemPath = $fullPath + '.meta'
+            Write-Verbose "    Meta `"$(Get-ItemName($metaItemPath))`""
+
             if (-not (Test-Path -Path $metaItemPath -PathType Leaf))
             {
-                Write-Error "There is no .meta file for `"$($item.FullName)`""
-                exit 1
+                Write-Host "There is no .meta file for `"$relativePath`""
+                #exit 1
             }
         }
 
-        if (Test-Path $item.FullName -PathType Container)
+        if (Test-Path $fullPath -PathType Container)
         {
-            $dirPaths.Add($item.FullName)
+            $dirPaths.Add($relativePath)
         }
     }
 
@@ -67,4 +73,18 @@ function Test-MetaFiles($path)
     }
 }
 
-& $Main
+# main block
+$basePath = "$PSScriptRoot/../.."
+Set-Location $basePath
+Write-Verbose "Base Path: `"$(Get-Location)`""
+
+$gitUtil = [Util]::new()
+$gitUtil.SetGitIgnoredFullPaths($basePath)
+Write-Verbose 'Ignore Paths:'
+$gitUtil.IgnoredFullPaths | ForEach-Object {
+    Write-Verbose "  `"$PSItem`""
+}
+
+[Util]::FindUnityMetaFolders() | ForEach-Object {
+    Test-MetaFiles $PSItem
+}

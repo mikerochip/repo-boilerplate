@@ -1,22 +1,35 @@
 
 class Util
 {
-    static [string[]]GetGitIgnoredFilePaths()
+    [string[]] $IgnoredFullPaths = @()
+
+    SetGitIgnoredFullPaths($basePath)
     {
-        $PrevLocation = Get-Location
-        Set-Location "$PSScriptRoot/../../../"
+        $this.IgnoredFullPaths = foreach ($path in @(git ls-files -i -o --directory --exclude-standard)) {
+            [System.IO.Path]::GetFullPath($path, $basePath) `
+                -replace '\\', '/' `
+                -replace '/$', ''
+        }
+    }
 
-        $Files = @(git ls-files -i -o --exclude-standard)
-
-        Set-Location $PrevLocation
-        return $Files
+    [bool]ShouldIgnoreMetaChecks($item)
+    {
+        if ($item -like '*~')
+        {
+            return $true
+        }
+        if ($this.IgnoredFullPaths.Contains($item.FullName))
+        {
+            return $true
+        }
+        return $false
     }
     
     static [string[]]FindUnityMetaFolders()
     {
         return @(
-            "$PSScriptRoot/ProjectUnity/Assets/"
-            "$PSScriptRoot/ProjectShared/Company.Project.Package/"
+            "ProjectUnity/Assets"
+            "ProjectShared/Company.Project.Package"
         )
     }
 }
