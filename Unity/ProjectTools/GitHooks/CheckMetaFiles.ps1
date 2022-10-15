@@ -1,6 +1,8 @@
 # support common parameters, mostly Verbose
 [CmdletBinding()]
-param()
+param(
+    [switch]$DryRun = $false
+)
 
 # import scripts
 . ./Util.ps1
@@ -45,7 +47,10 @@ function Test-MetaFiles($path)
             if (-not (Test-Path -Path $companionItemPath))
             {
                 Write-Host "There is no file or folder for `"$relativePath`""
-                #exit 1
+                if (-not $DryRun)
+                {
+                    exit 1
+                }
             }
         }
         else
@@ -57,7 +62,10 @@ function Test-MetaFiles($path)
             if (-not (Test-Path -Path $metaItemPath -PathType Leaf))
             {
                 Write-Host "There is no .meta file for `"$relativePath`""
-                #exit 1
+                if (-not $DryRun)
+                {
+                    exit 1
+                }
             }
         }
 
