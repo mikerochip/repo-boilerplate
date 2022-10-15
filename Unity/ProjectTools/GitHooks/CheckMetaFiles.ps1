@@ -12,7 +12,7 @@ param(
 function Get-RelativePath([string]$path) {
     # using this instead of [System.IO.Path]::GetRelativePath() so we get full paths in
     # case $BasePath is not in $path
-    return $path.TrimStart($BasePath)
+    return $path -replace "^($BasePath)*", ''
 }
 
 function Get-ItemName([string]$path) {
