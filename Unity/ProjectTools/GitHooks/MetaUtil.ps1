@@ -3,12 +3,18 @@ class MetaUtil
 {
     [string[]] $IgnoredFullPaths = @()
 
-    SetGitIgnoredFullPaths($basePath)
+    SetIgnoredFullPathsFromGit($basePath)
     {
+        Write-Verbose 'Ignored Paths:'
+
         $this.IgnoredFullPaths = foreach ($path in @(git ls-files -i -o --directory --exclude-standard)) {
-            [System.IO.Path]::GetFullPath($path, $basePath) `
+            $fullPath = [System.IO.Path]::GetFullPath($path, $basePath) `
                 -replace '\\', '/' `
                 -replace '/$', ''
+
+            Write-Verbose "  `"$fullPath`""
+            
+            $fullPath
         }
     }
 

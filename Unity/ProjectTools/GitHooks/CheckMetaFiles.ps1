@@ -75,13 +75,8 @@ Set-Location $basePath
 Write-Verbose "Base Path: `"$(Get-Location)`""
 
 $metaUtil = [MetaUtil]::new()
-$metaUtil.SetGitIgnoredFullPaths($basePath)
+$metaUtil.SetIgnoredFullPathsFromGit($basePath)
 
-Write-Verbose 'Ignore Paths:'
-$metaUtil.IgnoredFullPaths | ForEach-Object {
-    Write-Verbose "  `"$PSItem`""
-}
-
-[MetaUtil]::FindUnityMetaFolders() | ForEach-Object {
-    Test-MetaFiles $PSItem
+foreach ($path in [MetaUtil]::FindUnityMetaFolders()) {
+    Test-MetaFiles $path
 }
