@@ -77,9 +77,10 @@ Write-Verbose "Full `$BasePath: `"$BasePath`""
 
 Set-Location $BasePath
 
-$metaUtil = [MetaUtil]::new()
-$metaUtil.SetIgnoredFullPathsFromGit($BasePath)
+$metaUtil = [MetaUtil]::new($BasePath)
+$metaUtil.SetIgnoredFullPathsFromGit()
+$metaUtil.ReadFolderPathsWithMetaFiles()
 
-foreach ($path in [MetaUtil]::FindFolderPathsWithMetaFiles()) {
+foreach ($path in $metaUtil.FolderPathsWithMetaFiles) {
     Test-MetaFiles $path
 }
