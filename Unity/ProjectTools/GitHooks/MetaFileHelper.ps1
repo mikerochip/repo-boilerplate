@@ -3,7 +3,6 @@ class MetaFileHelper
 {
     [string] $BasePath = $pwd
     [string[]] $FolderPaths = @()
-    [string[]] $IgnoredFullPaths = @()
 
     MetaFileHelper([string]$projectPath) {
         $this.BasePath = $projectPath
@@ -26,32 +25,5 @@ class MetaFileHelper
             Write-Verbose 'Folder Paths:'
             $this.FolderPaths | ForEach-Object { Write-Verbose "  `"$PSItem`""}
         }
-    }
-
-    ReadIgnoredFullPathsFromGit() {
-        $gitIgnorePaths = git ls-files -i -o --directory --exclude-standard
-
-        $this.IgnoredFullPaths = foreach ($path in $gitIgnorePaths) {
-            # git returns folders with trailing slashes but Get-ChildItem does not,
-            # so remove the trailing slash to make it work with Get-ChildItem
-            $path = $path -replace '/$', ''
-            [System.IO.Path]::GetFullPath($path, $this.BasePath)
-        }
-
-        if ($PSBoundParameters['Verbose'] -ne 'SilentlyContinue') {
-            Write-Verbose 'Ignored Full Paths:'
-            $this.IgnoredFullPaths | ForEach-Object { Write-Verbose "  `"$PSItem`""}
-        }
-    }
-
-    [bool]ShouldIgnoreMetaChecks($item) {
-        # Unity ignores items ending in ~
-        if ($item -like '*~') {
-            return $true
-        }
-        if ($this.IgnoredFullPaths | Where-Object { $item.FullName -like $PSItem }) {
-            return $true
-        }
-        return $false
     }
 }

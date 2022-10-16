@@ -20,7 +20,7 @@ $indent = [System.Text.StringBuilder]::new()
 function Remove-EmptyFolder($path) {
     $null = $indent.Insert(0, "  ")
 
-    Write-Verbose "$($indent)Test `"$(Get-RelativePath($path))`""
+    Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
     $childItems = Get-ChildItem $path
     Write-Verbose "$($indent)BeginCount $($childItems.Count)"
@@ -29,11 +29,6 @@ function Remove-EmptyFolder($path) {
     foreach ($item in $childItems) {
         Write-Verbose "$($indent)Check `"$($item.Name)`""
 
-        if ($metaFileHelper.IgnoredFullPaths | Where-Object { $item.FullName -like $PSItem }) {
-            Write-Verbose "$($indent)Ignore `"$($item.Name)`""
-            continue
-        }
-
         if (-not (Test-Path $item -PathType Container)) {
             continue
         }
@@ -41,6 +36,16 @@ function Remove-EmptyFolder($path) {
         if (Remove-EmptyFolder $item.FullName) {
             Write-Verbose "$($indent)Removed `"$(Get-RelativePath($item.FullName))`""
             ++$removeCount
+
+            # remove meta file for this folder
+            $metaItemPath = $item.FullName + '.meta'
+            if (Test-Path $metaItemPath -PathType Leaf) {
+                Write-Host "Remove `"$(Get-RelativePath($metaItemPath))`""
+                if (-not $DryRun) {
+                    Remove-Item $metaItemPath -Force
+                }
+                ++$removeCount
+            }
         }
     }
 
@@ -55,7 +60,6 @@ function Remove-EmptyFolder($path) {
         }
     }
 
-    Write-Verbose "$($indent)isEmpty $isEmpty"
     $null = $indent.Remove(0, 2)
     return $isEmpty
 }
@@ -69,7 +73,6 @@ Set-Location $ProjectFullPath
 
 $metaFileHelper = [MetaFileHelper]::new($ProjectFullPath)
 $metaFileHelper.ReadFolderPaths()
-$metaFileHelper.ReadIgnoredFullPathsFromGit()
 
 Write-Verbose 'Begin Remove-EmptyFolder'
 foreach ($path in $metaFileHelper.FolderPaths) {

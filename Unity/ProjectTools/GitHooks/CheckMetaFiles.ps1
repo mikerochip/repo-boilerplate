@@ -19,17 +19,28 @@ function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
+function Test-IgnoreMetaChecks($item) {
+    # Unity ignores items ending in ~
+    if ($item -like '*~') {
+        return $true
+    }
+    return $false
+}
+
+$indent = [System.Text.StringBuilder]::new()
+
 function Test-MetaFiles($path) {
-    Write-Verbose "Get-ChildItem `"$(Get-RelativePath($path))`""
+    $null = $indent.Insert(0, "  ")
+
+    Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
     $dirPaths = New-Object System.Collections.Generic.List[string]
 
-    $childItems = @(Get-ChildItem $path)
-    foreach ($item in $childItems) {
-        Write-Verbose "  Check `"$($item.Name)`""
+    foreach ($item in Get-ChildItem $path) {
+        Write-Verbose "$($indent)Check `"$($item.Name)`""
 
-        if ($metaFileHelper.ShouldIgnoreMetaChecks($item)) {
-            Write-Verbose "    Ignore `"$($item.Name)`""
+        if (Test-IgnoreMetaChecks $item) {
+            Write-Verbose "$($indent)Ignore `"$($item.Name)`""
             continue
         }
 
@@ -38,7 +49,7 @@ function Test-MetaFiles($path) {
         if ($item -like '*.meta') {
             # is this a meta file without a companion item?
             $companionItemPath = $fullPath -replace '.meta$', ''
-            Write-Verbose "    Test-Path `"$(Get-ItemName($companionItemPath))`""
+            Write-Verbose "$($indent)Test-Path `"$(Get-ItemName($companionItemPath))`""
 
             if (-not (Test-Path -Path $companionItemPath)) {
                 Write-Host "There is no file or folder for `"$(Get-RelativePath($fullPath))`""
@@ -46,11 +57,10 @@ function Test-MetaFiles($path) {
                     exit 1
                 }
             }
-        }
-        else {
+        } else {
             # is this an item without a meta file?
             $metaItemPath = $fullPath + '.meta'
-            Write-Verbose "    Test-Path `"$(Get-ItemName($metaItemPath))`""
+            Write-Verbose "$($indent)Test-Path `"$(Get-ItemName($metaItemPath))`""
 
             if (-not (Test-Path -Path $metaItemPath -PathType Leaf)) {
                 Write-Host "There is no .meta file for `"$(Get-RelativePath($fullPath))`""
@@ -68,6 +78,8 @@ function Test-MetaFiles($path) {
     foreach ($dirPath in $dirPaths) {
         Test-MetaFiles $dirPath
     }
+    
+    $null = $indent.Remove(0, 2)
 }
 
 # main block
@@ -79,7 +91,6 @@ Set-Location $ProjectFullPath
 
 $metaFileHelper = [MetaFileHelper]::new($ProjectFullPath)
 $metaFileHelper.ReadFolderPaths()
-$metaFileHelper.ReadIgnoredFullPathsFromGit()
 
 Write-Verbose 'Begin Test-MetaFiles'
 foreach ($path in $metaFileHelper.FolderPaths) {
