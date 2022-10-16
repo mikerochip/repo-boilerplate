@@ -1,8 +1,8 @@
 # support common parameters, mostly Verbose
 [CmdletBinding()]
 param(
-    [string]$BasePath = $pwd,
-    [switch]$DryRun = $false
+    [string]$UnityBasePath = $pwd,
+    [switch]$DryRun
 )
 
 # import scripts
@@ -11,8 +11,8 @@ param(
 # functions
 function Get-RelativePath([string]$path) {
     # instead of using [System.IO.Path]::GetRelativePath(), we either want to remove
-    # $BasePath if $path starts with that, or we just want the original $path
-    return $path -replace "^($BasePath)*", ''
+    # $UnityBasePath if $path starts with that, or we just want the original $path
+    return $path -replace "^($UnityBasePath)*", ''
 }
 
 function Get-ItemName([string]$path) {
@@ -71,16 +71,17 @@ function Test-MetaFiles($path) {
 }
 
 # main block
-Write-Verbose "Param `$BasePath: `"$BasePath`""
-$BasePath = [System.IO.Path]::GetFullPath($BasePath)
-Write-Verbose "Full `$BasePath: `"$BasePath`""
+Write-Verbose "Param `$UnityBasePath: `"$UnityBasePath`""
+$UnityBasePath = [System.IO.Path]::GetFullPath($UnityBasePath)
+Write-Verbose "Full `$UnityBasePath: `"$UnityBasePath`""
 
-Set-Location $BasePath
+Set-Location $UnityBasePath
 
-$metaUtil = [MetaUtil]::new($BasePath)
-$metaUtil.SetIgnoredFullPathsFromGit()
-$metaUtil.ReadFolderPathsWithMetaFiles()
+$metaUtil = [MetaUtil]::new($UnityBasePath)
+$metaUtil.ReadFolderPaths()
+$metaUtil.ReadIgnoredFullPathsFromGit()
 
-foreach ($path in $metaUtil.FolderPathsWithMetaFiles) {
+Write-Verbose 'Begin Test-MetaFiles'
+foreach ($path in $metaUtil.FolderPaths) {
     Test-MetaFiles $path
 }

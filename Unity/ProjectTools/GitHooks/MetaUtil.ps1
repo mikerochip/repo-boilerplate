@@ -1,49 +1,44 @@
 
 class MetaUtil
 {
-    [string] $BasePath
+    [string] $UnityBasePath = $pwd
+    [string[]] $FolderPaths = @()
     [string[]] $IgnoredFullPaths = @()
-    [string[]] $FolderPathsWithMetaFiles = @()
 
-    MetaUtil([string]$basePath) {
-        $this.BasePath = $basePath
-    }
-
-    SetIgnoredFullPathsFromGit() {
-        Write-Verbose 'Ignored Paths:'
-
-        $gitIgnorePaths = git ls-files -i -o --directory --exclude-standard
-        
-        $this.IgnoredFullPaths = foreach ($path in $gitIgnorePaths) {
-            # remove trailing '/' from paths because that's what git ls-files does
-            $fullPath = [System.IO.Path]::GetFullPath($path, $this.BasePath) `
-                -replace '\\', '/' `
-                -replace '/$', ''
-
-            Write-Verbose "  `"$fullPath`""
-
-            $fullPath
-        }
+    MetaUtil([string]$unityBasePath) {
+        $this.UnityBasePath = $unityBasePath
     }
     
-    ReadFolderPathsWithMetaFiles() {
-        Write-Verbose 'Folder Paths with Meta Files:'
+    ReadFolderPaths() {
+        $this.FolderPaths = [System.IO.Path]::GetFullPath('Assets', $this.UnityBasePath)
 
-        $this.FolderPathsWithMetaFiles = 'Assets'
-        Write-Verbose "  `"Assets`""
-
-        # Unity adds meta files to local/embedded packages, which are in manifest.json
+        # Unity adds meta files to local/embedded packages, which we can read from manifest.json
         $manifest = Get-Content 'Packages/manifest.json' | ConvertFrom-Json
 
-        $this.FolderPathsWithMetaFiles += foreach ($property in $manifest.dependencies.PsObject.Properties) {
+        $this.FolderPaths += foreach ($property in $manifest.dependencies.PsObject.Properties) {
             if ($property.Value -like 'file:*') {
                 $path = $property.Value -replace '^file:*', ''
-                $fullPath = [System.IO.Path]::GetFullPath($path, $this.BasePath)
-
-                Write-Verbose "  `"$fullPath`""
-
-                $fullPath
+                [System.IO.Path]::GetFullPath($path, $this.UnityBasePath)
             }
+        }
+
+        if ($PSBoundParameters['Verbose'] -ne 'SilentlyContinue') {
+            Write-Verbose 'Folder Paths:'
+            $this.FolderPaths | ForEach-Object { Write-Verbose "  `"$PSItem`""}
+        }
+    }
+
+    ReadIgnoredFullPathsFromGit() {
+        $gitIgnorePaths = @(git ls-files -i -o --directory --exclude-standard)
+
+        $this.IgnoredFullPaths = foreach ($path in $gitIgnorePaths) {
+            [System.IO.Path]::GetFullPath($path, $this.UnityBasePath) `
+                -replace '\\', '/'
+        }
+
+        if ($PSBoundParameters['Verbose'] -ne 'SilentlyContinue') {
+            Write-Verbose 'Ignored Full Paths:'
+            $this.IgnoredFullPaths | ForEach-Object { Write-Verbose "  `"$PSItem`""}
         }
     }
 
