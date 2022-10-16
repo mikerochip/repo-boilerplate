@@ -11,7 +11,15 @@ class MetaFileHelper {
         return $null
     }
 
-    # this method includes manifest dependencies, but only if they live in the same repo
+    <#
+    .SYNOPSIS
+    Returns full paths of all top-level folders that include meta files.
+    .INPUTS
+    The Unity project at the given path.
+    .DESCRIPTION
+    Includes the 'Assets' folder. Also includes local and embedded package dependencies, but
+    only if they live in the same repo as the Unity project.
+    #>
     static [string[]]GetMetaFileFolderPaths([string]$unityProjectPath) {
         Write-Verbose 'GetMetaFileFolderPaths'
         Write-Verbose "  unityProjectPath `"$unityProjectPath`""
