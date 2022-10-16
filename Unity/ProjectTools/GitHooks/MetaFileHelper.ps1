@@ -1,22 +1,48 @@
 
 class MetaFileHelper {
+    static [string]FindGitPath([string]$path) {
+        while ($path) {
+            $gitPath = Get-ChildItem $path -Hidden | Where-Object { $PSItem.Name -eq '.git' }
+            if ($gitPath) {
+                return $gitPath
+            }
+            $path = [System.IO.Directory]::GetParent($path)
+        }
+        return $null
+    }
+
+    # this method includes manifest dependencies, but only if they live in the same repo
     static [string[]]GetMetaFileFolderPaths([string]$unityProjectPath) {
+        Write-Verbose 'GetMetaFileFolderPaths'
+        Write-Verbose "  unityProjectPath `"$unityProjectPath`""
+
+        $projectGitPath = [MetaFileHelper]::FindGitPath($unityProjectPath)
+        Write-Verbose "  projectGitPath `"$projectGitPath`""
+
+        # Unity adds meta files to:
+        # 1. "Assets/"
+        # 2. Any local or embedded packages in "Packages/manifest.json"
         $folderPaths = @([System.IO.Path]::GetFullPath('Assets', $unityProjectPath))
     
-        # Unity adds meta files to local/embedded packages, which we can read from manifest.json
         $manifest = Get-Content 'Packages/manifest.json' | ConvertFrom-Json
-    
         $folderPaths += foreach ($property in $manifest.dependencies.PsObject.Properties) {
-            if ($property.Value -like 'file:*') {
-                $path = $property.Value -replace '^file:*', ''
-                # it's fine if the path is outside the unity project
-                [System.IO.Path]::GetFullPath($path, $unityProjectPath)
+            if ($property.Value -notlike 'file:*') {
+                continue
             }
-        }
-    
-        if ($PSBoundParameters['Verbose'] -ne 'SilentlyContinue') {
-            Write-Verbose 'Meta File Folder Paths:'
-            $folderPaths | ForEach-Object { Write-Verbose "  `"$PSItem`""}
+
+            $path = $property.Value -replace '^file:*', ''
+            Write-Verbose "  Check `"$path`""
+
+            $dependencyGitPath = [MetaFileHelper]::FindGitPath($path)
+            Write-Verbose "  dependencyGitPath `"$dependencyGitPath`""
+
+            if ($projectGitPath -ne $dependencyGitPath) {
+                Write-Verbose "  Skip `"$path`""
+                continue
+            }
+            
+            Write-Verbose "  Include `"$path`""
+            [System.IO.Path]::GetFullPath($path, $unityProjectPath)
         }
 
         return $folderPaths
