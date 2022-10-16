@@ -3,4 +3,4 @@ command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\nThis repository is configure
 git lfs post-checkout "$@"
 
 command -v pwsh >/dev/null 2>&1 || { echo >&2 "\npwsh was not found on your path. Install PowerShell first.\n"; exit 2; }
-pwsh ProjectTools/GitHooks/DeleteEmptyFolders.ps1
+pwsh ProjectTools/GitHooks/DeleteEmptyFolders.ps1 -UnityProjectPath "ProjectUnity/"
