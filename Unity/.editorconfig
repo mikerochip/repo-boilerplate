@@ -9,7 +9,7 @@ end_of_line = lf
 insert_final_newline = true
 
 # stuff specific to project code
-[*.{cs,js,py,pwsh}]
+[*.{cs,js,ts,py,ps1,psm1,psd1}]
 charset = utf-8
 indent_style = space
 indent_size = 4
