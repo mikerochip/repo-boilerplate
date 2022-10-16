@@ -25,7 +25,7 @@ class MetaFileHelper {
         $folderPaths = @([System.IO.Path]::GetFullPath('Assets', $unityProjectPath))
     
         $manifest = Get-Content 'Packages/manifest.json' | ConvertFrom-Json
-        $folderPaths += foreach ($property in $manifest.dependencies.PsObject.Properties) {
+        $folderPaths += foreach ($property in $manifest.dependencies.PSObject.Properties) {
             if ($property.Value -notlike 'file:*') {
                 continue
             }
