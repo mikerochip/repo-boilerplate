@@ -1,16 +1,16 @@
 
-class MetaUtil
+class MetaFileHelper
 {
-    [string] $UnityBasePath = $pwd
+    [string] $BasePath = $pwd
     [string[]] $FolderPaths = @()
     [string[]] $IgnoredFullPaths = @()
 
-    MetaUtil([string]$unityBasePath) {
-        $this.UnityBasePath = $unityBasePath
+    MetaFileHelper([string]$projectPath) {
+        $this.BasePath = $projectPath
     }
     
     ReadFolderPaths() {
-        $this.FolderPaths = [System.IO.Path]::GetFullPath('Assets', $this.UnityBasePath)
+        $this.FolderPaths = [System.IO.Path]::GetFullPath('Assets', $this.BasePath)
 
         # Unity adds meta files to local/embedded packages, which we can read from manifest.json
         $manifest = Get-Content 'Packages/manifest.json' | ConvertFrom-Json
@@ -18,7 +18,7 @@ class MetaUtil
         $this.FolderPaths += foreach ($property in $manifest.dependencies.PsObject.Properties) {
             if ($property.Value -like 'file:*') {
                 $path = $property.Value -replace '^file:*', ''
-                [System.IO.Path]::GetFullPath($path, $this.UnityBasePath)
+                [System.IO.Path]::GetFullPath($path, $this.BasePath)
             }
         }
 
@@ -35,7 +35,7 @@ class MetaUtil
             # git returns folders with trailing slashes but Get-ChildItem does not,
             # so remove the trailing slash to make it work with Get-ChildItem
             $path = $path -replace '/$', ''
-            [System.IO.Path]::GetFullPath($path, $this.UnityBasePath)
+            [System.IO.Path]::GetFullPath($path, $this.BasePath)
         }
 
         if ($PSBoundParameters['Verbose'] -ne 'SilentlyContinue') {
@@ -46,12 +46,10 @@ class MetaUtil
 
     [bool]ShouldIgnoreMetaChecks($item) {
         # Unity ignores items ending in ~
-        if ($item -like '*~')
-        {
+        if ($item -like '*~') {
             return $true
         }
-        if ($this.IgnoredFullPaths | Where-Object { $item.FullName -like $PSItem })
-        {
+        if ($this.IgnoredFullPaths | Where-Object { $item.FullName -like $PSItem }) {
             return $true
         }
         return $false

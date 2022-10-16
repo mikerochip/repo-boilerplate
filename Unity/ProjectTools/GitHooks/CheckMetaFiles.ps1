@@ -1,18 +1,18 @@
 # support common parameters, mostly Verbose
 [CmdletBinding()]
 param(
-    [string]$UnityBasePath = $pwd,
+    [string]$UnityProjectPath = $pwd,
     [switch]$DryRun
 )
 
 # import scripts
-. $PSScriptRoot/MetaUtil.ps1
+. $PSScriptRoot/MetaFileHelper.ps1
 
 # functions
 function Get-RelativePath([string]$path) {
     # instead of using [System.IO.Path]::GetRelativePath(), we either want to remove
-    # $UnityBasePath if $path starts with that, or we just want the original $path
-    return $path -replace "^($UnityBasePath)*", ''
+    # $ProjectFullPath if $path starts with that, or we just want the original $path
+    return $path -replace "^($ProjectFullPath)*", ''
 }
 
 function Get-ItemName([string]$path) {
@@ -28,7 +28,7 @@ function Test-MetaFiles($path) {
     foreach ($item in $childItems) {
         Write-Verbose "  Check `"$($item.Name)`""
 
-        if ($metaUtil.ShouldIgnoreMetaChecks($item)) {
+        if ($metaFileHelper.ShouldIgnoreMetaChecks($item)) {
             Write-Verbose "    Ignore `"$($item.Name)`""
             continue
         }
@@ -71,17 +71,17 @@ function Test-MetaFiles($path) {
 }
 
 # main block
-Write-Verbose "Param `$UnityBasePath: `"$UnityBasePath`""
-$UnityBasePath = [System.IO.Path]::GetFullPath($UnityBasePath)
-Write-Verbose "Full `$UnityBasePath: `"$UnityBasePath`""
+Write-Verbose "Param `$UnityProjectPath: `"$UnityProjectPath`""
+$ProjectFullPath = [System.IO.Path]::GetFullPath($UnityProjectPath)
+Write-Verbose "Full `$ProjectFullPath: `"$ProjectFullPath`""
 
-Set-Location $UnityBasePath
+Set-Location $ProjectFullPath
 
-$metaUtil = [MetaUtil]::new($UnityBasePath)
-$metaUtil.ReadFolderPaths()
-$metaUtil.ReadIgnoredFullPathsFromGit()
+$metaFileHelper = [MetaFileHelper]::new($ProjectFullPath)
+$metaFileHelper.ReadFolderPaths()
+$metaFileHelper.ReadIgnoredFullPathsFromGit()
 
 Write-Verbose 'Begin Test-MetaFiles'
-foreach ($path in $metaUtil.FolderPaths) {
+foreach ($path in $metaFileHelper.FolderPaths) {
     Test-MetaFiles $path
 }
