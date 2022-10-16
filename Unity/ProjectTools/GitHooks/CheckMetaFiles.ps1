@@ -10,8 +10,8 @@ param(
 
 # functions
 function Get-RelativePath([string]$path) {
-    # using this instead of [System.IO.Path]::GetRelativePath() so we get full paths in
-    # case $BasePath is not in $path
+    # instead of using [System.IO.Path]::GetRelativePath(), we either want to remove
+    # $BasePath if $path starts with that, or we just want the original $path
     return $path -replace "^($BasePath)*", ''
 }
 
@@ -20,13 +20,13 @@ function Get-ItemName([string]$path) {
 }
 
 function Test-MetaFiles($path) {
-    Write-Verbose "Test `"$(Get-RelativePath($path))`""
+    Write-Verbose "Get-ChildItem `"$(Get-RelativePath($path))`""
 
     $dirPaths = New-Object System.Collections.Generic.List[string]
 
     $childItems = @(Get-ChildItem $path)
     foreach ($item in $childItems) {
-        Write-Verbose "  Test `"$($item.Name)`""
+        Write-Verbose "  Check `"$($item.Name)`""
 
         if ($metaUtil.ShouldIgnoreMetaChecks($item)) {
             Write-Verbose "    Ignore `"$($item.Name)`""
