@@ -18,7 +18,7 @@ function Get-RelativePath([string]$path) {
 $indent = [System.Text.StringBuilder]::new()
 
 function Remove-EmptyFolder($path) {
-    $indent.Insert(0, "  ")
+    $null = $indent.Insert(0, "  ")
 
     Write-Verbose "$($indent)Test `"$(Get-RelativePath($path))`""
 
@@ -44,17 +44,19 @@ function Remove-EmptyFolder($path) {
         }
     }
 
-    Write-Verbose "$($indent)EndCount $($childItems.Count - $removeCount) for `"$(Get-RelativePath($path))`""
+    $endCount = $childItems.Count - $removeCount
+    Write-Verbose "$($indent)EndCount $endCount for `"$(Get-RelativePath($path))`""
 
-    $isEmpty = $childItems.Count -eq $removeCount
+    $isEmpty = $endCount -eq 0
     if ($isEmpty) {
-        Write-Host "$($indent)Remove `"$(Get-RelativePath($path))`""
+        Write-Host "Remove `"$(Get-RelativePath($path))`""
         if (-not $DryRun) {
             Remove-Item $path -Force
         }
     }
 
-    $indent.Remove(0, 2)
+    Write-Verbose "$($indent)isEmpty $isEmpty"
+    $null = $indent.Remove(0, 2)
     return $isEmpty
 }
 
@@ -71,6 +73,6 @@ $metaFileHelper.ReadIgnoredFullPathsFromGit()
 
 Write-Verbose 'Begin Remove-EmptyFolder'
 foreach ($path in $metaFileHelper.FolderPaths) {
-    # we don't need the output at the top level, so pipe it to null
-    Remove-EmptyFolder $path | Out-Null
+    # we don't need the output at the top level
+    $null = Remove-EmptyFolder $path
 }
