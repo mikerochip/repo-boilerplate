@@ -29,11 +29,13 @@ class MetaUtil
     }
 
     ReadIgnoredFullPathsFromGit() {
-        $gitIgnorePaths = @(git ls-files -i -o --directory --exclude-standard)
+        $gitIgnorePaths = git ls-files -i -o --directory --exclude-standard
 
         $this.IgnoredFullPaths = foreach ($path in $gitIgnorePaths) {
-            [System.IO.Path]::GetFullPath($path, $this.UnityBasePath) `
-                -replace '\\', '/'
+            # git returns folders with trailing slashes but Get-ChildItem does not,
+            # so remove the trailing slash to make it work with Get-ChildItem
+            $path = $path -replace '/$', ''
+            [System.IO.Path]::GetFullPath($path, $this.UnityBasePath)
         }
 
         if ($PSBoundParameters['Verbose'] -ne 'SilentlyContinue') {
