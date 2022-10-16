@@ -2,6 +2,7 @@
   "dependencies": {
     "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#upm",
     "com.marijnzwemmer.unity-toolbar-extender": "https://github.com/marijnz/unity-toolbar-extender.git",
+    "com.mikerochip.git-tools": "https://github.com/mikerochip/unity-git-tools.git",
     "com.mikerochip.selection-history": "https://github.com/mikerochip/unity-selection-history.git",
     "com.unity.addressables": "1.20.0",
     "com.unity.device-simulator.devices": "1.0.0",
