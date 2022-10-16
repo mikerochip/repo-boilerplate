@@ -12,7 +12,9 @@ class MetaUtil
     SetIgnoredFullPathsFromGit() {
         Write-Verbose 'Ignored Paths:'
 
-        $this.IgnoredFullPaths = foreach ($path in @(git ls-files -i -o --directory --exclude-standard)) {
+        $gitIgnorePaths = git ls-files -i -o --directory --exclude-standard
+        
+        $this.IgnoredFullPaths = foreach ($path in $gitIgnorePaths) {
             # remove trailing '/' from paths because that's what git ls-files does
             $fullPath = [System.IO.Path]::GetFullPath($path, $this.BasePath) `
                 -replace '\\', '/' `
