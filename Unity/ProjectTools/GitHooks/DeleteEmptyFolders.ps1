@@ -71,11 +71,10 @@ Write-Verbose "Full `$ProjectFullPath: `"$ProjectFullPath`""
 
 Set-Location $ProjectFullPath
 
-$metaFileHelper = [MetaFileHelper]::new($ProjectFullPath)
-$metaFileHelper.ReadFolderPaths()
+$metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($ProjectFullPath)
 
 Write-Verbose 'Begin Remove-EmptyFolder'
-foreach ($path in $metaFileHelper.FolderPaths) {
+foreach ($path in $metaFileFolderPaths) {
     # we don't need the output at the top level
     $null = Remove-EmptyFolder $path
 }

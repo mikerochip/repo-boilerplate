@@ -11,8 +11,8 @@ param(
 # functions
 function Get-RelativePath([string]$path) {
     # instead of using [System.IO.Path]::GetRelativePath(), we either want to remove
-    # $ProjectFullPath if $path starts with that, or we just want the original $path
-    return $path -replace "^($ProjectFullPath)*", ''
+    # $UnityProjectPath if $path starts with that, or we just want the original $path
+    return $path -replace "^($UnityProjectPath)*", ''
 }
 
 function Get-ItemName([string]$path) {
@@ -78,21 +78,20 @@ function Test-MetaFiles($path) {
     foreach ($dirPath in $dirPaths) {
         Test-MetaFiles $dirPath
     }
-    
+
     $null = $indent.Remove(0, 2)
 }
 
 # main block
 Write-Verbose "Param `$UnityProjectPath: `"$UnityProjectPath`""
-$ProjectFullPath = [System.IO.Path]::GetFullPath($UnityProjectPath)
-Write-Verbose "Full `$ProjectFullPath: `"$ProjectFullPath`""
+$UnityProjectPath = [System.IO.Path]::GetFullPath($UnityProjectPath)
+Write-Verbose "Full `$UnityProjectPath: `"$UnityProjectPath`""
 
-Set-Location $ProjectFullPath
+Set-Location $UnityProjectPath
 
-$metaFileHelper = [MetaFileHelper]::new($ProjectFullPath)
-$metaFileHelper.ReadFolderPaths()
+$metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPath)
 
 Write-Verbose 'Begin Test-MetaFiles'
-foreach ($path in $metaFileHelper.FolderPaths) {
+foreach ($path in $metaFileFolderPaths) {
     Test-MetaFiles $path
 }
