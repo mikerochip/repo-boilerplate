@@ -7,7 +7,6 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
 {
     public static class AssetsMenuExtensions
     {
-        #region Menu Items
         [MenuItem("Assets/Copy Full Path", isValidateFunction: true)]
         private static bool ValidateCopyFullPath() =>
             Selection.GetFiltered<Object>(SelectionMode.DeepAssets).Length > 0;
@@ -16,7 +15,7 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
         private static void CopyFullPath()
         {
             var builder = new StringBuilder();
-            foreach (var object in Selection.GetFiltered<Object>(SelectionMode.DeepAssets))
+            foreach (var obj in Selection.GetFiltered<Object>(SelectionMode.DeepAssets))
             {
                 var assetPath = AssetDatabase.GetAssetPath(obj);
                 var fullPath = Path.GetFullPath(assetPath);
@@ -40,7 +39,7 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
         private static void CopyGuid()
         {
             var builder = new StringBuilder();
-            foreach (var object in Selection.GetFiltered<Object>(SelectionMode.DeepAssets))
+            foreach (var obj in Selection.GetFiltered<Object>(SelectionMode.DeepAssets))
             {
                 var assetPath = AssetDatabase.GetAssetPath(obj);
                 var guid = AssetDatabase.AssetPathToGUID(assetPath);
