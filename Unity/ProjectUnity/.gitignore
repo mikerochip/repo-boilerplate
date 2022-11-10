@@ -38,6 +38,7 @@ Thumbs.db
 # Visual Studio
 .vs/
 .vscode/
+.vsconfig/
 
 # JetBrains Rider
 .idea/
