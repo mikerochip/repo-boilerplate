@@ -34,9 +34,22 @@ function Test-MetaFiles($path) {
 
     Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
+    $items = @(Get-ChildItem $path)
+
+    # is this an empty folder?
+    if ($items.Count -eq 0) {
+        Write-Host ("Found empty folder `"$(Get-RelativePath($path))`"`n" +
+                    "If you want to keep it, make a blank file named `".keep`"")
+        if (-not $DryRun) {
+            exit 1
+        } else {
+            return
+        }
+    }
+
     $dirPaths = New-Object System.Collections.Generic.List[string]
 
-    foreach ($item in Get-ChildItem $path) {
+    foreach ($item in $items) {
         Write-Verbose "$($indent)Check `"$($item.Name)`""
 
         if (Test-IgnoreMetaChecks $item) {
