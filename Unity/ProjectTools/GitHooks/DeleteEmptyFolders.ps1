@@ -12,7 +12,7 @@ param(
 function Get-RelativePath([string]$path) {
     # instead of using [System.IO.Path]::GetRelativePath(), we either want to remove
     # $UnityProjectPath if $path starts with that, or we just want the original $path
-    return $path -replace "^($UnityProjectPath)*", ''
+    return $path.Replace("$UnityProjectPath", '')
 }
 
 $indent = [System.Text.StringBuilder]::new()
