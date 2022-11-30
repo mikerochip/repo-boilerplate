@@ -41,7 +41,7 @@ function Remove-EmptyFolder($path) {
             # either this folder is empty or only has ignored files, delete it
             Write-Host "$($indent)Remove `"$(Get-RelativePath($item.FullName))`""
             if (-not $DryRun) {
-                Remove-Item $path -Recurse -Force
+                Get-ChildItem $item.FullName -Recurse -Force | Remove-Item -Recurse -Force
             }
 
             # remove meta file for this folder

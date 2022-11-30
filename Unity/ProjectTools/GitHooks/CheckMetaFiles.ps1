@@ -24,7 +24,7 @@ function Test-IgnoreMetaChecks($item, [string[]]$gitItems) {
     if ($item -like '*~') {
         return $true
     }
-    if ($item.Name -notin $gitItems) {
+    if ((Test-Path $item -PathType Leaf) -and ($item.Name -notin $gitItems)) {
         return $true
     }
     return $false
