@@ -19,9 +19,12 @@ function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
-function Test-IgnoreMetaChecks($item) {
+function Test-IgnoreMetaChecks($item, [string[]]$gitItems) {
     # Unity ignores items ending in ~
     if ($item -like '*~') {
+        return $true
+    }
+    if ($item.Name -notin $gitItems) {
         return $true
     }
     return $false
@@ -34,15 +37,18 @@ function Test-MetaFiles($path) {
 
     Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
-    $items = @(Get-ChildItem $path)
+    Set-Location $path
+    $items = Get-ChildItem
+    $gitItems = [MetaFileHelper]::GetCurrentDirGitItems()
 
-    # is this an empty folder?
-    if ($items.Count -eq 0) {
-        Write-Host ("Found empty folder `"$(Get-RelativePath($path))`"`n" +
-                    "If you want to keep it, make a blank file named `".keep`"")
+    # is this folder empty or have all ignored files?
+    if ($gitItems.Count -eq 0) {
+        Write-Host ("Folder `"$(Get-RelativePath($path))`" is empty or has all ignored files`n" +
+                    "Either delete it or add a blank file named `".keep`" to keep it")
         if (-not $DryRun) {
             exit 1
         } else {
+            $null = $indent.Remove(0, 2)
             return
         }
     }
@@ -52,7 +58,7 @@ function Test-MetaFiles($path) {
     foreach ($item in $items) {
         Write-Verbose "$($indent)Check `"$($item.Name)`""
 
-        if (Test-IgnoreMetaChecks $item) {
+        if (Test-IgnoreMetaChecks $item $gitItems) {
             Write-Verbose "$($indent)Ignore `"$($item.Name)`""
             continue
         }

@@ -22,10 +22,10 @@ function Remove-EmptyFolder($path) {
 
     Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
-    $childItems = Get-ChildItem $path
-    Write-Verbose "$($indent)BeginCount $($childItems.Count)"
+    Set-Location $path
+    $childItems = Get-ChildItem
+    $gitItems = [MetaFileHelper]::GetCurrentDirGitItems()
 
-    $removeCount = 0
     foreach ($item in $childItems) {
         Write-Verbose "$($indent)Check `"$($item.Name)`""
 
@@ -33,30 +33,25 @@ function Remove-EmptyFolder($path) {
             continue
         }
 
-        if (Remove-EmptyFolder $item.FullName) {
-            Write-Verbose "$($indent)Removed `"$(Get-RelativePath($item.FullName))`""
-            ++$removeCount
+        if ($gitItems.Contains($item.Name)) {
+            # if git thinks this folder exists, then we need to go deeper
+            Remove-EmptyFolder $item.FullName
+            Set-Location $path
+        } else {
+            # either this folder is empty or only has ignored files, delete it
+            Write-Host "$($indent)Remove `"$(Get-RelativePath($item.FullName))`""
+            if (-not $DryRun) {
+                Remove-Item $path -Recurse -Force
+            }
 
             # remove meta file for this folder
             $metaItemPath = $item.FullName + '.meta'
             if (Test-Path $metaItemPath -PathType Leaf) {
-                Write-Host "Remove `"$(Get-RelativePath($metaItemPath))`""
+                Write-Host "$($indent)Remove `"$(Get-RelativePath($metaItemPath))`""
                 if (-not $DryRun) {
                     Remove-Item $metaItemPath -Force
                 }
-                ++$removeCount
             }
-        }
-    }
-
-    $endCount = $childItems.Count - $removeCount
-    Write-Verbose "$($indent)EndCount $endCount for `"$(Get-RelativePath($path))`""
-
-    $isEmpty = $endCount -eq 0
-    if ($isEmpty) {
-        Write-Host "Remove `"$(Get-RelativePath($path))`""
-        if (-not $DryRun) {
-            Remove-Item $path -Force
         }
     }
 

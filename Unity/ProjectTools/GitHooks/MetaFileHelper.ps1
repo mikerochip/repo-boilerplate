@@ -84,4 +84,30 @@ class MetaFileHelper {
 
         return $dirPaths.ToArray()
     }
+
+    <#
+    .SYNOPSIS
+    Returns first path part of all items in current directory that git is aware of.
+    .DESCRIPTION
+    Runs git ls-files twice - once to catch all files and once more to remove deleted files.
+    Returns the array resulting from removing the deleted files from all files.
+    #>
+    static [string[]]GetCurrentDirGitItems() {
+        $items = @(git ls-files --others --cached --exclude-standard)
+        $deletedItems = @(git ls-files --deleted --exclude-standard)
+        $items = @($items | Where-Object { $PSItem -notin $deletedItems })
+        for ($i = 0; $i -lt $items.Length; ++$i)
+        {
+            $item = $items[$i]
+            $slashIndex = $item.IndexOf('/')
+            $backslashIndex = $item.IndexOf('\\')
+            $firstSlashIndex = ($slashIndex -gt 0) ? ($slashIndex -lt $backslashIndex ? $slashIndex : ($backslashIndex -lt 0) ? $slashIndex : $backslashIndex) : $backslashIndex
+            if ($firstSlashIndex -lt 0) {
+                continue
+            }
+            $items[$i] = $item.Substring(0, $firstSlashIndex)
+        }
+        $items = $items | Select-Object -Unique
+        return $items
+    }
 }
