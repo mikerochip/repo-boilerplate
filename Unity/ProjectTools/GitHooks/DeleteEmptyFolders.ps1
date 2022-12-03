@@ -75,7 +75,7 @@ $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPat
 Write-Verbose 'Begin Remove-EmptyFolder'
 foreach ($path in $metaFileFolderPaths) {
     $gitFolderTable = @{}
-    $gitItems = [MetaFileHelper]::GetGitItems($path, $gitFolderTable)
+    $null = [MetaFileHelper]::GetGitItems($path, $gitFolderTable)
 
     # we don't need the output at the top level
     $null = Remove-EmptyFolder $path
