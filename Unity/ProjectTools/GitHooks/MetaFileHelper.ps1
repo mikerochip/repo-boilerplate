@@ -87,27 +87,53 @@ class MetaFileHelper {
 
     <#
     .SYNOPSIS
-    Returns first path part of all items in current directory that git is aware of.
+    Returns all file paths in current directory that git is aware of.
+
+    .PARAMETER basePath
+    Path to start gathering Git files.
+
+    .PARAMETER gitFolderTable
+    Will be filled in with all parent folders and subfolders of Git files.
+
     .DESCRIPTION
     Runs git ls-files twice - once to catch all files and once more to remove deleted files.
     Returns the array resulting from removing the deleted files from all files.
     #>
-    static [string[]]GetCurrentDirGitItems() {
-        $items = @(git ls-files --others --cached --exclude-standard)
-        $deletedItems = @(git ls-files --deleted --exclude-standard)
-        $items = @($items | Where-Object { $PSItem -notin $deletedItems })
-        for ($i = 0; $i -lt $items.Length; ++$i)
-        {
-            $item = $items[$i]
-            $slashIndex = $item.IndexOf('/')
-            $backslashIndex = $item.IndexOf('\\')
-            $firstSlashIndex = ($slashIndex -gt 0) ? ($slashIndex -lt $backslashIndex ? $slashIndex : ($backslashIndex -lt 0) ? $slashIndex : $backslashIndex) : $backslashIndex
-            if ($firstSlashIndex -lt 0) {
-                continue
+    static [string[]]GetGitItems([string]$basePath, [hashtable]$gitFolderTable) {
+        Write-Verbose "GetGitItems `"$basePath`""
+
+        # the PowerShell Location APIs are what commands base their paths on
+        $prevLocation = Get-Location
+        Set-Location $basePath
+        $paths = @(git ls-files --others --cached --exclude-standard)
+        $deletedPaths = @(git ls-files --deleted --exclude-standard)
+        $paths = @($paths | Where-Object { $PSItem -notin $deletedPaths })
+        Set-Location $prevLocation
+
+        # the .Net APIs affect working directory paths
+        $workingDirectory = [System.IO.Directory]::GetCurrentDirectory()
+        [System.IO.Directory]::SetCurrentDirectory($basePath)
+        
+        for ($i = 0; $i -lt $paths.Length; ++$i) {
+            $path = $paths[$i]
+            $fullPath = [System.IO.Path]::GetFullPath($path)
+            Write-Verbose "  Path `"$fullPath`""
+            $paths[$i] = $fullPath
+
+            if ($null -ne $gitFolderTable) {
+                $path = [System.IO.Directory]::GetParent($path).FullName
+                while ($path -ne $basePath) {
+                    $gitFolderTable[$path] = $true
+                    $path = [System.IO.Directory]::GetParent($path).FullName
+                }
             }
-            $items[$i] = $item.Substring(0, $firstSlashIndex)
         }
-        $items = $items | Select-Object -Unique
-        return $items
+
+        [System.IO.Directory]::SetCurrentDirectory($workingDirectory)
+
+        return $paths
+    }
+    static [string[]]GetGitItems([string]$basePath) {
+        return [MetaFileHelper]::GetGitItems($basePath, $null)
     }
 }

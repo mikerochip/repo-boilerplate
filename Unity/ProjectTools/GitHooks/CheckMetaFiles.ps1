@@ -19,12 +19,24 @@ function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
-function Test-IgnoreMetaChecks($item, [string[]]$gitItems) {
+function Test-IsEmptyForGit($items) {
+    foreach ($item in $items) {
+        if (Test-Path $item -PathType Container) {
+            return $false
+        }
+        if ($item -in $gitItems) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function Test-IgnoreMetaChecks($item) {
     # Unity ignores items ending in ~
     if ($item -like '*~') {
         return $true
     }
-    if ((Test-Path $item -PathType Leaf) -and ($item.Name -notin $gitItems)) {
+    if ((Test-Path $item -PathType Leaf) -and ($item -notin $gitItems)) {
         return $true
     }
     return $false
@@ -37,12 +49,10 @@ function Test-MetaFiles($path) {
 
     Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
-    Set-Location $path
-    $items = Get-ChildItem
-    $gitItems = [MetaFileHelper]::GetCurrentDirGitItems()
+    $items = Get-ChildItem $path
 
     # is this folder empty or have all ignored files?
-    if ($gitItems.Count -eq 0) {
+    if (Test-IsEmptyForGit $items) {
         Write-Host ("Folder `"$(Get-RelativePath($path))`" is empty or has all ignored files`n" +
                     "Either delete it or add a blank file named `".keep`" to keep it")
         if (-not $DryRun) {
@@ -58,7 +68,7 @@ function Test-MetaFiles($path) {
     foreach ($item in $items) {
         Write-Verbose "$($indent)Check `"$($item.Name)`""
 
-        if (Test-IgnoreMetaChecks $item $gitItems) {
+        if (Test-IgnoreMetaChecks $item) {
             Write-Verbose "$($indent)Ignore `"$($item.Name)`""
             continue
         }
@@ -106,11 +116,11 @@ Write-Verbose "Param `$UnityProjectPath: `"$UnityProjectPath`""
 $UnityProjectPath = [System.IO.Path]::GetFullPath($UnityProjectPath)
 Write-Verbose "Full `$UnityProjectPath: `"$UnityProjectPath`""
 
-Set-Location $UnityProjectPath
-
 $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPath)
 
 Write-Verbose 'Begin Test-MetaFiles'
 foreach ($path in $metaFileFolderPaths) {
+    $gitItems = [MetaFileHelper]::GetGitItems($path)
+    
     Test-MetaFiles $path
 }

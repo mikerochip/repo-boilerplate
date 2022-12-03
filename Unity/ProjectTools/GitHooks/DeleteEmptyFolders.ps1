@@ -17,14 +17,19 @@ function Get-RelativePath([string]$path) {
 
 $indent = [System.Text.StringBuilder]::new()
 
+function Test-HasGitItems([string]$dirPath) {
+    Write-Verbose "$($indent)Test-HasGitItems `"$dirPath`""
+    $contains = $gitFolderTable.ContainsKey($dirPath)
+    Write-Verbose "$($indent)  $contains"
+    return $contains
+}
+
 function Remove-EmptyFolder($path) {
     $null = $indent.Insert(0, "  ")
 
     Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
-    Set-Location $path
-    $childItems = Get-ChildItem
-    $gitItems = [MetaFileHelper]::GetCurrentDirGitItems()
+    $childItems = Get-ChildItem $path
 
     foreach ($item in $childItems) {
         Write-Verbose "$($indent)Check `"$($item.Name)`""
@@ -33,19 +38,20 @@ function Remove-EmptyFolder($path) {
             continue
         }
 
-        if ($gitItems.Contains($item.Name)) {
+        $fullPath = $item.FullName
+
+        if (Test-HasGitItems $fullPath) {
             # if git thinks this folder exists, then we need to go deeper
-            Remove-EmptyFolder $item.FullName
-            Set-Location $path
+            Remove-EmptyFolder $fullPath
         } else {
             # either this folder is empty or only has ignored files, delete it
-            Write-Host "$($indent)Remove `"$(Get-RelativePath($item.FullName))`""
+            Write-Host "$($indent)Remove `"$(Get-RelativePath($fullPath))`""
             if (-not $DryRun) {
                 Get-ChildItem $item.FullName -Recurse -Force | Remove-Item -Recurse -Force
             }
 
             # remove meta file for this folder
-            $metaItemPath = $item.FullName + '.meta'
+            $metaItemPath = $fullPath + '.meta'
             if (Test-Path $metaItemPath -PathType Leaf) {
                 Write-Host "$($indent)Remove `"$(Get-RelativePath($metaItemPath))`""
                 if (-not $DryRun) {
@@ -64,12 +70,13 @@ Write-Verbose "Param `$UnityProjectPath: `"$UnityProjectPath`""
 $UnityProjectPath = [System.IO.Path]::GetFullPath($UnityProjectPath)
 Write-Verbose "Full `$UnityProjectPath: `"$UnityProjectPath`""
 
-Set-Location $UnityProjectPath
-
 $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPath)
 
 Write-Verbose 'Begin Remove-EmptyFolder'
 foreach ($path in $metaFileFolderPaths) {
+    $gitFolderTable = @{}
+    $gitItems = [MetaFileHelper]::GetGitItems($path, $gitFolderTable)
+
     # we don't need the output at the top level
     $null = Remove-EmptyFolder $path
 }
