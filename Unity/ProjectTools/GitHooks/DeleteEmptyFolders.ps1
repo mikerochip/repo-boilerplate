@@ -62,7 +62,6 @@ function Remove-EmptyFolder($path) {
     }
 
     $null = $indent.Remove(0, 2)
-    return $isEmpty
 }
 
 # main block
@@ -72,11 +71,11 @@ Write-Verbose "Full `$UnityProjectPath: `"$UnityProjectPath`""
 
 $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPath)
 
-Write-Verbose 'Begin Remove-EmptyFolder'
 foreach ($path in $metaFileFolderPaths) {
+    Write-Verbose "Check Top-Level `"$path`""
+    
     $gitFolderTable = @{}
     $null = [MetaFileHelper]::GetGitItems($path, $gitFolderTable)
 
-    # we don't need the output at the top level
-    $null = Remove-EmptyFolder $path
+    Remove-EmptyFolder $path
 }

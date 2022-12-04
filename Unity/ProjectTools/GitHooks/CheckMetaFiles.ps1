@@ -118,8 +118,9 @@ Write-Verbose "Full `$UnityProjectPath: `"$UnityProjectPath`""
 
 $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPath)
 
-Write-Verbose 'Begin Test-MetaFiles'
 foreach ($path in $metaFileFolderPaths) {
+    Write-Verbose "Check Top-Level `"$path`""
+
     $gitItems = [MetaFileHelper]::GetGitItems($path)
     
     Test-MetaFiles $path
