@@ -33,26 +33,32 @@ class MetaFileHelper {
         # 3. Local packages from "Packages/manifest.json"
         $dirPaths = New-Object System.Collections.Generic.List[string]
         
-        Write-Verbose "  Add Assets"
-        $dirPaths.Add([System.IO.Path]::GetFullPath('Assets', $unityProjectPath))
+        $assetsPath = [System.IO.Path]::GetFullPath('Assets', $unityProjectPath)
+        Write-Verbose "  Add $assetsPath"
+        $dirPaths.Add($assetsPath)
+
+        $prevLocation = Get-Location
+        $prevWorkingDirectory = [System.IO.Directory]::GetCurrentDirectory()
+        
+        $newWorkingDirectory = [System.IO.Path]::Combine($unityProjectPath, "Packages")
+        Write-Verbose "  Set Dir `"$newWorkingDirectory`""
+        [System.IO.Directory]::SetCurrentDirectory($newWorkingDirectory)
+        Set-Location $newWorkingDirectory
 
         Write-Verbose "  Check Embedded Packages"
-        foreach ($item in Get-ChildItem "Packages" -Directory) {
+        foreach ($item in Get-ChildItem -Directory) {
             Write-Verbose "  Check `"$item`""
             Write-Verbose "    Test `"$item/package.json`""
             if (Test-Path "$item/package.json" -PathType Leaf) {
-                Write-Verbose "    Include"
+                Write-Verbose "    Add"
                 $dirPaths.Add($item.FullName)
             } else {
                 Write-Verbose "    Skip: No `"package.json`""
             }
         }
 
-        $prevWorkingDirectory = [System.IO.Directory]::GetCurrentDirectory()
-        [System.IO.Directory]::SetCurrentDirectory("$unityProjectPath/Packages")
-
         Write-Verbose "  Check Local Packages"
-        $manifest = Get-Content 'Packages/manifest.json' | ConvertFrom-Json
+        $manifest = Get-Content 'manifest.json' | ConvertFrom-Json
         foreach ($property in $manifest.dependencies.PSObject.Properties) {
             if ($property.Value -notlike 'file:*') {
                 continue
@@ -80,7 +86,9 @@ class MetaFileHelper {
             Write-Verbose "    Include"
             $dirPaths.Add($path)
         }
+
         [System.IO.Directory]::SetCurrentDirectory($prevWorkingDirectory)
+        Set-Location $prevLocation
 
         return $dirPaths.ToArray()
     }
