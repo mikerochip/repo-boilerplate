@@ -32,22 +32,25 @@ function Test-IsEmptyForGit($items) {
 }
 
 function Test-UnityHiddenItem($item) {
+    $name = $item.Name
+    
     # see https://docs.unity3d.com/Manual/SpecialFolders.html
     if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
         return $true
     }
-    if ($item -like '.*') {
+    if ($name -like '.*') {
         return $true
     }
-    if ($item -like '*~') {
+    if ($name -like '*~') {
         return $true
     }
-    if ($item -like 'cvs') {
+    if ($name -like 'cvs') {
         return $true
     }
-    if ($item -like '*.tmp') {
+    if ($name -like '*.tmp') {
         return $true
     }
+    
     return $false
 }
 
@@ -95,7 +98,7 @@ function Test-MetaFiles($path) {
 
         $fullPath = $item.FullName
 
-        if ($item -like '*.meta') {
+        if ($item.Name -like '*.meta') {
             # is this a meta file without a companion item?
             $companionItemPath = $fullPath -replace '.meta$', ''
             Write-Verbose "$($indent)Test-Path `"$(Get-ItemName($companionItemPath))`""
