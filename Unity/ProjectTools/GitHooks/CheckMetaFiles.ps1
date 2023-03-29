@@ -31,11 +31,31 @@ function Test-IsEmptyForGit($items) {
     return $true
 }
 
-function Test-IgnoreMetaChecks($item) {
-    # Unity ignores items ending in ~
+function Test-UnityHiddenItem($item) {
+    # see https://docs.unity3d.com/Manual/SpecialFolders.html
+    if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
+        return $true
+    }
+    if ($item -like '.*') {
+        return $true
+    }
     if ($item -like '*~') {
         return $true
     }
+    if ($item -like 'cvs') {
+        return $true
+    }
+    if ($item -like '*.tmp') {
+        return $true
+    }
+    return $false
+}
+
+function Test-IgnoreMetaChecks($item) {
+    if (Test-UnityHiddenItem $item) {
+        return $true
+    }
+    # skip files that have no git items
     if ((Test-Path $item -PathType Leaf) -and ($item -notin $gitItems)) {
         return $true
     }
@@ -49,7 +69,7 @@ function Test-MetaFiles($path) {
 
     Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
 
-    $items = Get-ChildItem $path
+    $items = Get-ChildItem $path -Force
 
     # is this folder empty or have all ignored files?
     if (Test-IsEmptyForGit $items) {
