@@ -3,7 +3,7 @@ class MetaFileHelper {
     # see https://docs.unity3d.com/Manual/SpecialFolders.html
     static [bool]IsUnityHiddenItem([System.IO.FileSystemInfo]$item) {
         $name = $item.Name
-        
+
         if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
             return $true
         }
@@ -118,7 +118,7 @@ class MetaFileHelper {
 
     <#
     .SYNOPSIS
-    Returns all file paths in current directory that git is aware of.
+    Returns all full file paths in current directory that git is aware of.
 
     .PARAMETER basePath
     Path to start gathering Git files.
@@ -130,8 +130,8 @@ class MetaFileHelper {
     Runs git ls-files twice - once to catch all files and once more to remove deleted files.
     Returns the array resulting from removing the deleted files from all files.
     #>
-    static [string[]]GetGitItems([string]$basePath, [hashtable]$gitFolderTable) {
-        Write-Verbose "GetGitItems `"$basePath`""
+    static [string[]]GetGitTrackedFullPaths([string]$basePath, [hashtable]$gitFolderTable) {
+        Write-Verbose "GetGitTrackedFullPaths `"$basePath`""
 
         # the PowerShell Location APIs are what commands base their paths on
         $prevLocation = Get-Location
@@ -164,7 +164,7 @@ class MetaFileHelper {
 
         return $paths
     }
-    static [string[]]GetGitItems([string]$basePath) {
-        return [MetaFileHelper]::GetGitItems($basePath, $null)
+    static [string[]]GetGitTrackedFullPaths([string]$basePath) {
+        return [MetaFileHelper]::GetGitTrackedFullPaths($basePath, $null)
     }
 }

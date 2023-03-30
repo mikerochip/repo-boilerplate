@@ -17,9 +17,9 @@ function Get-RelativePath([string]$path) {
 
 $indent = [System.Text.StringBuilder]::new()
 
-function Test-HasGitItems([string]$dirPath) {
-    Write-Verbose "$($indent)Test-HasGitItems `"$dirPath`""
-    $contains = $gitFolderTable.ContainsKey($dirPath)
+function Test-HasGitTrackedItems([string]$fullPath) {
+    Write-Verbose "$($indent)Test-HasGitTrackedItems `"$(Get-RelativePath($fullPath))`""
+    $contains = $gitFolderTable.ContainsKey($fullPath)
     Write-Verbose "$($indent)  $contains"
     return $contains
 }
@@ -40,8 +40,7 @@ function Remove-EmptyFolder($path) {
 
         $fullPath = $item.FullName
 
-        if (Test-HasGitItems $fullPath) {
-            # if git thinks this folder exists, then we need to go deeper
+        if (Test-HasGitTrackedItems $fullPath) {
             Remove-EmptyFolder $fullPath
         } else {
             # either this folder is empty or only has ignored files, delete it
@@ -75,7 +74,7 @@ foreach ($path in $metaFileFolderPaths) {
     Write-Verbose "Check Top-Level `"$path`""
     
     $gitFolderTable = @{}
-    $null = [MetaFileHelper]::GetGitItems($path, $gitFolderTable)
+    $null = [MetaFileHelper]::GetGitTrackedFullPaths($path, $gitFolderTable)
 
     Remove-EmptyFolder $path
 }

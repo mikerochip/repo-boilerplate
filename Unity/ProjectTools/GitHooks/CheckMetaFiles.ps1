@@ -19,12 +19,12 @@ function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
-function Test-IsEmptyForGit($items) {
+function Test-EmptyOrGitIgnored($items) {
     foreach ($item in $items) {
         if (Test-Path $item -PathType Container) {
             return $false
         }
-        if ($item -in $gitItems) {
+        if ($item.FullName -in $gitFileFullPaths) {
             return $false
         }
     }
@@ -35,7 +35,7 @@ function Test-IgnoreMetaChecks($item) {
     if ([MetaFileHelper]::IsUnityHiddenItem($item)) {
         return $true
     }
-    if ((Test-Path $item -PathType Leaf) -and ($item -notin $gitItems)) {
+    if ((Test-Path $item -PathType Leaf) -and ($item.FullName -notin $gitFileFullPaths)) {
         return $true
     }
     return $false
@@ -51,7 +51,7 @@ function Test-MetaFiles($path) {
     $items = Get-ChildItem $path -Force
 
     # is this folder empty or have all ignored files?
-    if (Test-IsEmptyForGit $items) {
+    if (Test-EmptyOrGitIgnored $items) {
         Write-Host ("Folder `"$(Get-RelativePath($path))`" is empty or has all ignored files`n" +
                     "Either delete it or add a blank file named `".keep`" to keep it")
         if (-not $DryRun) {
@@ -74,7 +74,7 @@ function Test-MetaFiles($path) {
 
         $fullPath = $item.FullName
 
-        if ($item.Name -like '*.meta') {
+        if ($item -like '*.meta') {
             # is this a meta file without a companion item?
             $companionItemPath = $fullPath -replace '.meta$', ''
             Write-Verbose "$($indent)Test-Path `"$(Get-ItemName($companionItemPath))`""
@@ -120,7 +120,7 @@ $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPat
 foreach ($path in $metaFileFolderPaths) {
     Write-Verbose "Check Top-Level `"$path`""
 
-    $gitItems = [MetaFileHelper]::GetGitItems($path)
+    $gitFileFullPaths = [MetaFileHelper]::GetGitTrackedFullPaths($path)
     
     Test-MetaFiles $path
 }
