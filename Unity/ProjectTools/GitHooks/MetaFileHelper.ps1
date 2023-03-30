@@ -1,5 +1,28 @@
 
 class MetaFileHelper {
+    # see https://docs.unity3d.com/Manual/SpecialFolders.html
+    static [bool]IsUnityHiddenItem([System.IO.FileSystemInfo]$item) {
+        $name = $item.Name
+        
+        if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
+            return $true
+        }
+        if ($name -like '.*') {
+            return $true
+        }
+        if ($name -like '*~') {
+            return $true
+        }
+        if ($name -like 'cvs') {
+            return $true
+        }
+        if ($name -like '*.tmp') {
+            return $true
+        }
+
+        return $false
+    }
+
     static [string]FindGitPath([string]$path) {
         while ($path) {
             $gitPath = "$path/.git"

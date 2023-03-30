@@ -31,34 +31,10 @@ function Test-IsEmptyForGit($items) {
     return $true
 }
 
-function Test-UnityHiddenItem($item) {
-    $name = $item.Name
-    
-    # see https://docs.unity3d.com/Manual/SpecialFolders.html
-    if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
-        return $true
-    }
-    if ($name -like '.*') {
-        return $true
-    }
-    if ($name -like '*~') {
-        return $true
-    }
-    if ($name -like 'cvs') {
-        return $true
-    }
-    if ($name -like '*.tmp') {
-        return $true
-    }
-    
-    return $false
-}
-
 function Test-IgnoreMetaChecks($item) {
-    if (Test-UnityHiddenItem $item) {
+    if ([MetaFileHelper]::IsUnityHiddenItem($item)) {
         return $true
     }
-    # skip files that have no git items
     if ((Test-Path $item -PathType Leaf) -and ($item -notin $gitItems)) {
         return $true
     }
