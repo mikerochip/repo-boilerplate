@@ -5,29 +5,38 @@ root = true
 
 # Baseline
 [*]
+end_of_line = lf
 charset = utf-8
-indent_style = tab
-indent_size = 4
+indent_style = space
 tab_width = 4
 trim_trailing_whitespace = false
 max_line_length = 120
 
-# MSBuild
-[*.{csproj,proj,projitems,shproj,fsproj,target,props}]
-indent_style = space
-indent_size = 2
-
-# XML config files
-[*.{config,nuspec,resx,natvis}]
-indent_style = space
-indent_size = 2
-
-# Python files
-[*.py]
-indent_style = space
+# stuff specific to project code
+[*.{cs,c,h,cpp,cxx}]
+indent_style = tab
 indent_size = 4
 
-# YAML files
-[*.yaml]
-indent_style = space
+[*.{js,ts,py,sh,bat,command,ps1,psm1,psd1}]
+charset = utf-8
+indent_size = 4
+
+# config files
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# MSBuild
+[*.{csproj,proj,projitems,shproj,fsproj,target,props}]
+end_of_line = crlf
+
+# VS project files
+[*.{sln,csproj,fsproj,vbproj,vcxproj,vcproj,dbproj}]
+end_of_line = crlf
+[*.{lsproj,wixproj,modelproj,sqlproj,wmaproj,xproj}]
+end_of_line = crlf
+[*.{booproj,unityproj,props,filters,vcxitems}]
+end_of_line = crlf
+
+# XML files
+[*.{config,nuspec,resx,natvis}]
 indent_size = 2

@@ -8,17 +8,16 @@ root = true
 end_of_line = lf
 trim_trailing_whitespace = true
 insert_final_newline = true
+indent_size = 4
 
 # stuff specific to project code
 [*.{cs,c,h,cpp,cxx}]
 charset = utf-8
 indent_style = tab
-indent_size = 4
 
-[*.{js,ts,py,ps1,psm1,psd1}]
+[*.{js,ts,py,sh,bat,command,ps1,psm1,psd1}]
 charset = utf-8
 indent_style = space
-indent_size = 4
 
 [*.{json,yml,yaml}]
 charset = utf-8
