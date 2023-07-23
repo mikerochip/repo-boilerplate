@@ -1,8 +1,7 @@
 # support common parameters, mostly Verbose
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess)]
 param(
-    [string]$UnityProjectPath = $pwd,
-    [switch]$DryRun
+    [string]$UnityProjectPath = $pwd
 )
 
 # import scripts
@@ -45,7 +44,7 @@ function Remove-EmptyFolder($path) {
         } else {
             # either this folder is empty or only has ignored files, delete it
             Write-Host "$($indent)Remove `"$(Get-RelativePath($fullPath))`""
-            if (-not $DryRun) {
+            if (-not $WhatIfPreference) {
                 Get-ChildItem $item.FullName -Recurse -Force | Remove-Item -Recurse -Force
             }
 
@@ -53,7 +52,7 @@ function Remove-EmptyFolder($path) {
             $metaItemPath = $fullPath + '.meta'
             if (Test-Path $metaItemPath -PathType Leaf) {
                 Write-Host "$($indent)Remove `"$(Get-RelativePath($metaItemPath))`""
-                if (-not $DryRun) {
+                if (-not $WhatIfPreference) {
                     Remove-Item $metaItemPath -Force
                 }
             }

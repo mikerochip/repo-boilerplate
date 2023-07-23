@@ -1,8 +1,7 @@
 # support common parameters, mostly Verbose
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess)]
 param(
-    [string]$UnityProjectPath = $pwd,
-    [switch]$DryRun
+    [string]$UnityProjectPath = $pwd
 )
 
 # import scripts
@@ -54,7 +53,7 @@ function Test-MetaFiles($path) {
     if (Test-EmptyOrGitIgnored $items) {
         Write-Host ("Folder `"$(Get-RelativePath($path))`" is empty or has all ignored files`n" +
                     "Either delete it or add a blank file named `".keep`" to keep it")
-        if (-not $DryRun) {
+        if (-not $WhatIfPreference) {
             exit 1
         } else {
             $null = $indent.Remove(0, 2)
@@ -81,7 +80,7 @@ function Test-MetaFiles($path) {
 
             if (-not (Test-Path -Path $companionItemPath)) {
                 Write-Host "There is no file or folder for `"$(Get-RelativePath($fullPath))`""
-                if (-not $DryRun) {
+                if (-not $WhatIfPreference) {
                     exit 1
                 }
             }
@@ -92,7 +91,7 @@ function Test-MetaFiles($path) {
 
             if (-not (Test-Path -Path $metaItemPath -PathType Leaf)) {
                 Write-Host "There is no .meta file for `"$(Get-RelativePath($fullPath))`""
-                if (-not $DryRun) {
+                if (-not $WhatIfPreference) {
                     exit 1
                 }
             }
