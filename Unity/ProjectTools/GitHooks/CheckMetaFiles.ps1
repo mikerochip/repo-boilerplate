@@ -23,7 +23,7 @@ function Test-EmptyOrGitIgnored($items) {
         if (Test-Path $item -PathType Container) {
             return $false
         }
-        if ($item.FullName -in $gitFileFullPaths) {
+        if ($gitFileTable.Contains($item.FullName)) {
             return $false
         }
     }
@@ -34,7 +34,7 @@ function Test-IgnoreMetaChecks($item) {
     if ([MetaFileHelper]::IsUnityHiddenItem($item)) {
         return $true
     }
-    if ((Test-Path $item -PathType Leaf) -and ($item.FullName -notin $gitFileFullPaths)) {
+    if ((Test-Path $item -PathType Leaf) -and !$gitFileTable.Contains($item.FullName)) {
         return $true
     }
     return $false
@@ -119,7 +119,8 @@ $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPat
 foreach ($path in $metaFileFolderPaths) {
     Write-Verbose "Check Top-Level `"$path`""
 
-    $gitFileFullPaths = [MetaFileHelper]::GetGitTrackedFullPaths($path)
+    $gitFileTable = @{}
+    [MetaFileHelper]::GetGitTrackedFullPaths($path, $gitFileTable, $null)
     
     Test-MetaFiles $path
 }

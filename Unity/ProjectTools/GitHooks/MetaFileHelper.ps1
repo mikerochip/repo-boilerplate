@@ -118,20 +118,27 @@ class MetaFileHelper {
 
     <#
     .SYNOPSIS
-    Returns all full file paths in current directory that git is aware of.
+    Gather all Git-tracked file and folder full paths from the given directory.
 
     .PARAMETER basePath
     Path to start gathering Git files.
 
-    .PARAMETER gitFolderTable
+    .PARAMETER fileTable
+    Will be filled in with all Git files.
+
+    .PARAMETER folderTable
     Will be filled in with all parent folders and subfolders of Git files.
 
     .DESCRIPTION
     Runs git ls-files twice - once to catch all files and once more to remove deleted files.
-    Returns the array resulting from removing the deleted files from all files.
+    Uses the result to fill in a table of file full paths and a table of folder full paths.
     #>
-    static [string[]]GetGitTrackedFullPaths([string]$basePath, [hashtable]$gitFolderTable) {
+    static GetGitTrackedFullPaths([string]$basePath, [hashtable]$fileTable, [hashtable]$folderTable) {
         Write-Verbose "GetGitTrackedFullPaths `"$basePath`""
+
+        if ($null -eq $folderTable -and $null -eq $fileTable) {
+            throw 'Either "$folderTable" or "$fileTable" must be specified'
+        }
 
         # the PowerShell Location APIs are what commands base their paths on
         $prevLocation = Get-Location
@@ -144,27 +151,24 @@ class MetaFileHelper {
         # the .Net APIs affect working directory paths
         $workingDirectory = [System.IO.Directory]::GetCurrentDirectory()
         [System.IO.Directory]::SetCurrentDirectory($basePath)
-        
         for ($i = 0; $i -lt $paths.Length; ++$i) {
             $path = $paths[$i]
             $fullPath = [System.IO.Path]::GetFullPath($path)
-            Write-Verbose "  Path `"$fullPath`""
-            $paths[$i] = $fullPath
 
-            if ($null -ne $gitFolderTable) {
-                $path = [System.IO.Directory]::GetParent($path).FullName
-                while ($path -ne $basePath) {
-                    $gitFolderTable[$path] = $true
-                    $path = [System.IO.Directory]::GetParent($path).FullName
+            if ($null -ne $fileTable) {
+                Write-Verbose "  AddFile `"$fullPath`""
+                $fileTable[$fullPath] = $true
+            }
+
+            if ($null -ne $folderTable) {
+                $fullPath = [System.IO.Directory]::GetParent($fullPath).FullName
+                while ($fullPath -ne $basePath -and !$folderTable.ContainsKey($fullPath)) {
+                    Write-Verbose "  AddFolder `"$fullPath`""
+                    $folderTable[$fullPath] = $true
+                    $fullPath = [System.IO.Directory]::GetParent($fullPath).FullName
                 }
             }
         }
-
         [System.IO.Directory]::SetCurrentDirectory($workingDirectory)
-
-        return $paths
-    }
-    static [string[]]GetGitTrackedFullPaths([string]$basePath) {
-        return [MetaFileHelper]::GetGitTrackedFullPaths($basePath, $null)
     }
 }

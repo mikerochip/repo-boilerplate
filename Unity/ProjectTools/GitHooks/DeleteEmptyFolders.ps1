@@ -18,7 +18,7 @@ $indent = [System.Text.StringBuilder]::new()
 
 function Test-HasGitTrackedItems([string]$fullPath) {
     Write-Verbose "$($indent)Test-HasGitTrackedItems `"$(Get-RelativePath($fullPath))`""
-    $contains = $gitFolderTable.ContainsKey($fullPath)
+    $contains = $gitFolderTable.Contains($fullPath)
     Write-Verbose "$($indent)  $contains"
     return $contains
 }
@@ -73,7 +73,7 @@ foreach ($path in $metaFileFolderPaths) {
     Write-Verbose "Check Top-Level `"$path`""
     
     $gitFolderTable = @{}
-    $null = [MetaFileHelper]::GetGitTrackedFullPaths($path, $gitFolderTable)
+    [MetaFileHelper]::GetGitTrackedFullPaths($path, $null, $gitFolderTable)
 
     Remove-EmptyFolder $path
 }
