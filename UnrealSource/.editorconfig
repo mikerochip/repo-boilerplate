@@ -17,7 +17,7 @@ max_line_length = 120
 indent_style = tab
 indent_size = 4
 
-[*.{js,ts,py,sh,bat,command,ps1,psm1,psd1}]
+[*.{js,ts,py,sh,bat,command,ps1,psm1,psd1,axaml,xaml}]
 charset = utf-8
 indent_size = 4
 

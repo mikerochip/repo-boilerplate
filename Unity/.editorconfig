@@ -11,7 +11,7 @@ insert_final_newline = true
 indent_size = 4
 
 # stuff specific to project code
-[*.{cs,js,ts,py,sh,bat,command,ps1,psm1,psd1}]
+[*.{cs,js,ts,py,sh,bat,command,ps1,psm1,psd1,axaml,xaml}]
 charset = utf-8
 indent_style = space
 
