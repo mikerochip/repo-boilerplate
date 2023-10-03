@@ -27,3 +27,13 @@ end_of_line = crlf
 end_of_line = crlf
 [*.{booproj,unityproj,props,filters,vcxitems}]
 end_of_line = crlf
+
+# "Ignore" Unity text-based assets
+# See https://github.com/editorconfig/editorconfig/issues/228
+[*.{asset,prefab,unity}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+indent_style = unset
+indent_size = unset
