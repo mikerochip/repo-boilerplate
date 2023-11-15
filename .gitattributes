@@ -1,31 +1,38 @@
 # let git try to figure out what's text
 *                   text=auto eol=lf
+
 # tell git some specific files are text
-*.gitattributes     text
-*.gitignore         text
-*.md                text
-# posix
+*.gitattributes     text eol=lf
+*.gitignore         text eol=lf
+*.md                text eol=lf
+
+# linux and mac
 *.sh                text eol=lf
+*.command           text eol=lf
+
 # windows
 *.bat               text eol=crlf
+
 # visual studio
 *.sln               text eol=crlf
+*.filters           text eol=crlf
+*.props             text eol=crlf
+*.vcxitems          text eol=crlf
+*.xaml              text eol=crlf
 *.csproj            text eol=crlf
-*.vbproj            text eol=crlf
-*.vcxproj           text eol=crlf
-*.vcproj            text eol=crlf
 *.dbproj            text eol=crlf
 *.fsproj            text eol=crlf
 *.lsproj            text eol=crlf
-*.wixproj           text eol=crlf
 *.modelproj         text eol=crlf
 *.sqlproj           text eol=crlf
+*.vbproj            text eol=crlf
+*.vcproj            text eol=crlf
+*.vcxproj           text eol=crlf
+*.wixproj           text eol=crlf
 *.wmaproj           text eol=crlf
 *.xproj             text eol=crlf
-*.props             text eol=crlf
-*.filters           text eol=crlf
-*.vcxitems          text eol=crlf
-# LFS files
+
+# LFS
 # git-lfs is SUPER picky about the format of these lines.
 # git lfs migrate command WON'T think a file is tracked if it isn't formatted
 # with exactly one space after the extension and before the filter.
