@@ -18,7 +18,7 @@ function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
-function Test-EmptyOrGitIgnored($items) {
+function Test-NoFilesOrAllIgnoredFiles($items) {
     foreach ($item in $items) {
         if (Test-Path $item -PathType Container) {
             return $false
@@ -37,6 +37,9 @@ function Test-IgnoreMetaChecks($item) {
     if ((Test-Path $item -PathType Leaf) -and !$gitFileTable.Contains($item.FullName)) {
         return $true
     }
+    if ((Test-Path $item -PathType Container) -and !$gitFolderTable.Contains($item.FullName)) {
+        return $true
+    }
     return $false
 }
 
@@ -49,8 +52,8 @@ function Test-MetaFiles($path) {
 
     $items = Get-ChildItem $path -Force
 
-    # is this folder empty or have all ignored files?
-    if (Test-EmptyOrGitIgnored $items) {
+    # this folder is subject to meta checks, but is empty or has all ignored files
+    if (Test-NoFilesOrAllIgnoredFiles $items) {
         Write-Host ("Folder `"$(Get-RelativePath($path))`" is empty or has all ignored files`n" +
                     "Either delete it or add a blank file named `".keep`" to keep it")
         if (-not $WhatIfPreference) {
@@ -120,7 +123,8 @@ foreach ($path in $metaFileFolderPaths) {
     Write-Verbose "Check Top-Level `"$path`""
 
     $gitFileTable = @{}
-    [MetaFileHelper]::GetGitTrackedFullPaths($path, $gitFileTable, $null)
-    
+    $gitFolderTable = @{}
+    [MetaFileHelper]::GetGitTrackedFullPaths($path, $gitFileTable, $gitFolderTable)
+
     Test-MetaFiles $path
 }
