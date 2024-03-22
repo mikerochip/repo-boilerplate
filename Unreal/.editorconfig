@@ -19,7 +19,7 @@ indent_style = tab
 charset = utf-8
 indent_style = space
 
-[*.{json,yml,yaml}]
+[*.{json,yml,yaml,toml,ini,config}]
 charset = utf-8
 indent_style = space
 indent_size = 2
