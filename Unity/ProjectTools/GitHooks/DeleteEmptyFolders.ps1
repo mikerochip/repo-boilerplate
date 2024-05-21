@@ -50,7 +50,7 @@ function Remove-EmptyFolder($path) {
 
             # remove meta file for this folder
             $metaItemPath = $fullPath + '.meta'
-            if (Test-Path $metaItemPath -PathType Leaf) {
+            if (Test-Path -LiteralPath $metaItemPath -PathType Leaf) {
                 Write-Host "$($indent)Remove `"$(Get-RelativePath($metaItemPath))`""
                 if (-not $WhatIfPreference) {
                     Remove-Item $metaItemPath -Force
@@ -71,7 +71,7 @@ $metaFileFolderPaths = [MetaFileHelper]::GetMetaFileFolderPaths($UnityProjectPat
 
 foreach ($path in $metaFileFolderPaths) {
     Write-Verbose "Check Top-Level `"$path`""
-    
+
     $gitFolderTable = @{}
     [MetaFileHelper]::GetGitTrackedFullPaths($path, $null, $gitFolderTable)
 

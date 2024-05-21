@@ -81,7 +81,7 @@ function Test-MetaFiles($path) {
             $companionItemPath = $fullPath -replace '.meta$', ''
             Write-Verbose "$($indent)Test-Path `"$(Get-ItemName($companionItemPath))`""
 
-            if (-not (Test-Path -Path $companionItemPath)) {
+            if (-not (Test-Path -LiteralPath $companionItemPath)) {
                 Write-Host "There is no file or folder for `"$(Get-RelativePath($fullPath))`""
                 if (-not $WhatIfPreference) {
                     exit 1
@@ -92,7 +92,7 @@ function Test-MetaFiles($path) {
             $metaItemPath = $fullPath + '.meta'
             Write-Verbose "$($indent)Test-Path `"$(Get-ItemName($metaItemPath))`""
 
-            if (-not (Test-Path -Path $metaItemPath -PathType Leaf)) {
+            if (-not (Test-Path -LiteralPath $metaItemPath -PathType Leaf)) {
                 Write-Host "There is no .meta file for `"$(Get-RelativePath($fullPath))`""
                 if (-not $WhatIfPreference) {
                     exit 1
@@ -100,7 +100,7 @@ function Test-MetaFiles($path) {
             }
         }
 
-        if (Test-Path $fullPath -PathType Container) {
+        if (Test-Path -LiteralPath $fullPath -PathType Container) {
             $dirPaths.Add($fullPath)
         }
     }

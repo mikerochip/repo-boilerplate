@@ -26,7 +26,7 @@ class MetaFileHelper {
     static [string]FindGitPath([string]$path) {
         while ($path) {
             $gitPath = "$path/.git"
-            if (Test-Path $gitPath -PathType Container) {
+            if (Test-Path -LiteralPath $gitPath -PathType Container) {
                 return $gitPath
             }
             $path = [System.IO.Directory]::GetParent($path)
@@ -55,14 +55,14 @@ class MetaFileHelper {
         # 2. Embedded packages in "Packages/"
         # 3. Local packages from "Packages/manifest.json"
         $dirPaths = New-Object System.Collections.Generic.List[string]
-        
+
         $assetsPath = [System.IO.Path]::GetFullPath('Assets', $unityProjectPath)
         Write-Verbose "  Add $assetsPath"
         $dirPaths.Add($assetsPath)
 
         $prevLocation = Get-Location
         $prevWorkingDirectory = [System.IO.Directory]::GetCurrentDirectory()
-        
+
         $newWorkingDirectory = [System.IO.Path]::Combine($unityProjectPath, "Packages")
         Write-Verbose "  Set Dir `"$newWorkingDirectory`""
         [System.IO.Directory]::SetCurrentDirectory($newWorkingDirectory)
@@ -72,7 +72,7 @@ class MetaFileHelper {
         foreach ($item in Get-ChildItem -Directory) {
             Write-Verbose "  Check `"$item`""
             Write-Verbose "    Test `"$item/package.json`""
-            if (Test-Path "$item/package.json" -PathType Leaf) {
+            if (Test-Path -LiteralPath "$item/package.json" -PathType Leaf) {
                 Write-Verbose "    Add"
                 $dirPaths.Add($item.FullName)
             } else {
@@ -89,7 +89,7 @@ class MetaFileHelper {
 
             $path = $property.Value -replace '^file:*', ''
             Write-Verbose "  Check `"$path`""
-            
+
             $path = [System.IO.Path]::GetFullPath($path)
             Write-Verbose "    Path `"$path`""
 
@@ -105,7 +105,7 @@ class MetaFileHelper {
                 Write-Verbose "    Skip: DifferentGitPath"
                 continue
             }
-            
+
             Write-Verbose "    Include"
             $dirPaths.Add($path)
         }
