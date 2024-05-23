@@ -23,6 +23,31 @@ class MetaFileHelper {
         return $false
     }
 
+    static [bool]ShouldCheckChildItems([System.IO.FileSystemInfo]$item) {
+        if (-not (Test-Path $item -PathType Container)) {
+            return $false
+        }
+
+        $name = $item.Name
+
+        # these are Mac app Bundles and Packages that Unity does not open, regardless of platform
+        # see https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/AboutBundles/AboutBundles.html
+        if ($name -like '*.bundle') {
+            return $false
+        }
+        if ($name -like '*.app') {
+            return $false
+        }
+        if ($name -like '*.framework') {
+            return $false
+        }
+        if ($name -like '*.plugin') {
+            return $false
+        }
+
+        return $true
+    }
+
     static [string]FindGitPath([string]$path) {
         while ($path) {
             $gitPath = "$path/.git"

@@ -18,7 +18,7 @@ function Get-ItemName([string]$path) {
     return [System.IO.Path]::GetFileName($path)
 }
 
-function Test-NoFilesOrAllIgnoredFiles($items) {
+function Test-NoSourceControlledFiles($items) {
     foreach ($item in $items) {
         if (Test-Path $item -PathType Container) {
             return $false
@@ -34,10 +34,10 @@ function Test-IgnoreMetaChecks($item) {
     if ([MetaFileHelper]::IsUnityHiddenItem($item)) {
         return $true
     }
-    if ((Test-Path $item -PathType Leaf) -and !$gitFileTable.Contains($item.FullName)) {
+    if (Test-Path $item -PathType Leaf -and !$gitFileTable.Contains($item.FullName)) {
         return $true
     }
-    if ((Test-Path $item -PathType Container) -and !$gitFolderTable.Contains($item.FullName)) {
+    if (Test-Path $item -PathType Container -and !$gitFolderTable.Contains($item.FullName)) {
         return $true
     }
     return $false
@@ -53,7 +53,7 @@ function Test-MetaFiles($path) {
     $items = Get-ChildItem $path -Force
 
     # this folder is subject to meta checks, but is empty or has all ignored files
-    if (Test-NoFilesOrAllIgnoredFiles $items) {
+    if (Test-NoSourceControlledFiles $items) {
         Write-Host ("Folder `"$(Get-RelativePath($path))`" is empty or has all ignored files`n" +
                     "Either delete it or add a blank file named `".keep`" to keep it")
         if (-not $WhatIfPreference) {
@@ -100,7 +100,7 @@ function Test-MetaFiles($path) {
             }
         }
 
-        if (Test-Path -LiteralPath $fullPath -PathType Container) {
+        if ([MetaFileHelper]::ShouldCheckChildItems($item)) {
             $dirPaths.Add($fullPath)
         }
     }
