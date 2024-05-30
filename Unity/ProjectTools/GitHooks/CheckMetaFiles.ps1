@@ -34,10 +34,10 @@ function Test-IgnoreMetaChecks($item) {
     if ([MetaFileHelper]::IsUnityHiddenItem($item)) {
         return $true
     }
-    if (Test-Path $item -PathType Leaf -and !$gitFileTable.Contains($item.FullName)) {
+    if ((Test-Path $item -PathType Leaf) -and !$gitFileTable.Contains($item.FullName)) {
         return $true
     }
-    if (Test-Path $item -PathType Container -and !$gitFolderTable.Contains($item.FullName)) {
+    if ((Test-Path $item -PathType Container) -and !$gitFolderTable.Contains($item.FullName)) {
         return $true
     }
     return $false
