@@ -1,10 +1,10 @@
-# support common parameters, mostly Verbose
+# support common parameters, mostly Verbose and WhatIf
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$UnityProjectPath = $pwd
 )
 
-# import scripts
+# imports
 . $PSScriptRoot/MetaFileHelper.ps1
 
 # functions

@@ -59,6 +59,13 @@ class MetaFileHelper {
         return $null
     }
 
+    static [string[]]ConvertGitLsResultToArray([string]$result) {
+        if ($result) {
+            return $result.Split("`0", [System.StringSplitOptions]::RemoveEmptyEntries)
+        }
+        return @()
+    }
+
     <#
     .SYNOPSIS
     Returns full paths of all folders that include meta files for the Unity project.
@@ -168,9 +175,16 @@ class MetaFileHelper {
         # the PowerShell Location APIs are what commands base their paths on
         $prevLocation = Get-Location
         Set-Location $basePath
-        $paths = @(git ls-files --others --cached --exclude-standard)
-        $deletedPaths = @(git ls-files --deleted --exclude-standard)
-        $paths = @($paths | Where-Object { $PSItem -notin $deletedPaths })
+
+        # We have to specify -z otherwise Git will encode paths with escape sequences for
+        # \ and " as well as use octal encoding(!) for Unicode characters. Also, -z means the
+        # delimiter becomes the NULL character, and, for whatever reason, we can't combine
+        # --format and --others, so we have to convert the output manually.
+        # See https://stackoverflow.com/questions/40679814/unescaping-special-characters-in-git-output/40721503#40721503
+        $paths = [MetaFileHelper]::ConvertGitLsResultToArray((git ls-files --others --cached --exclude-standard -z))
+        $deletedPaths = [MetaFileHelper]::ConvertGitLsResultToArray((git ls-files --deleted --exclude-standard -z))
+        $paths = $paths | Where-Object { $PSItem -notin $deletedPaths }
+
         Set-Location $prevLocation
 
         # the .Net APIs affect working directory paths
