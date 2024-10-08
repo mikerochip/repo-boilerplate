@@ -1,14 +1,14 @@
 # let git try to figure out what's text
 *                   text=auto eol=lf
 
-# tell git some specific files are text
+# git dotfiles
 *.gitattributes     text eol=lf
 *.gitignore         text eol=lf
-*.md                text eol=lf
+*.gitmodules        text eol=lf
 
 # linux and mac
-*.sh                text eol=lf
 *.command           text eol=lf
+*.sh                text eol=lf
 
 # windows
 *.bat               text eol=crlf
@@ -33,18 +33,25 @@
 *.xproj             text eol=crlf
 
 # LFS
-# git-lfs is SUPER picky about the format of these lines.
-# git lfs migrate command WON'T think a file is tracked if it isn't formatted
-# with exactly one space after the extension and before the filter.
+# Notes
+# * git-lfs migrate is SUPER picky about the format of these lines.
+#   The command WON'T think a file is tracked if it isn't formatted
+#   with exactly one space after the extension and before the filter.
+# * Credit for some of these goes to:
+#   https://github.com/believer-oss/ethos/blob/main/birdie/README.md
 *.264 filter=lfs diff=lfs merge=lfs -text
 *.7Z filter=lfs diff=lfs merge=lfs -text
 *.7z filter=lfs diff=lfs merge=lfs -text
 *.aar filter=lfs diff=lfs merge=lfs -text
 *.AAR filter=lfs diff=lfs merge=lfs -text
+*.aep filter=lfs diff=lfs merge=lfs -text
+*.AEP filter=lfs diff=lfs merge=lfs -text
 *.ai filter=lfs diff=lfs merge=lfs -text
 *.AI filter=lfs diff=lfs merge=lfs -text
 *.avi filter=lfs diff=lfs merge=lfs -text
 *.AVI filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.BLEND filter=lfs diff=lfs merge=lfs -text
 *.bmp filter=lfs diff=lfs merge=lfs -text
 *.BMP filter=lfs diff=lfs merge=lfs -text
 *.bytes filter=lfs diff=lfs merge=lfs -text
@@ -57,6 +64,8 @@
 *.DLL filter=lfs diff=lfs merge=lfs -text
 *.dylib filter=lfs diff=lfs merge=lfs -text
 *.DYLIB filter=lfs diff=lfs merge=lfs -text
+*.eps filter=lfs diff=lfs merge=lfs -text
+*.EPS filter=lfs diff=lfs merge=lfs -text
 *.eot filter=lfs diff=lfs merge=lfs -text
 *.EOT filter=lfs diff=lfs merge=lfs -text
 *.exe filter=lfs diff=lfs merge=lfs -text
@@ -67,6 +76,10 @@
 *.FBX filter=lfs diff=lfs merge=lfs -text
 *.gif filter=lfs diff=lfs merge=lfs -text
 *.GIF filter=lfs diff=lfs merge=lfs -text
+*.glb filter=lfs diff=lfs merge=lfs -text
+*.GLB filter=lfs diff=lfs merge=lfs -text
+*.gltf filter=lfs diff=lfs merge=lfs -text
+*.GLTF filter=lfs diff=lfs merge=lfs -text
 *.gz filter=lfs diff=lfs merge=lfs -text
 *.GZ filter=lfs diff=lfs merge=lfs -text
 *.hdr filter=lfs diff=lfs merge=lfs -text
@@ -81,18 +94,28 @@
 *.JPG filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 *.JPEG filter=lfs diff=lfs merge=lfs -text
+*.ma filter=lfs diff=lfs merge=lfs -text
+*.MA filter=lfs diff=lfs merge=lfs -text
 *.mb filter=lfs diff=lfs merge=lfs -text
 *.MB filter=lfs diff=lfs merge=lfs -text
 *.mdb filter=lfs diff=lfs merge=lfs -text
 *.MDB filter=lfs diff=lfs merge=lfs -text
 *.mkv filter=lfs diff=lfs merge=lfs -text
 *.MKV filter=lfs diff=lfs merge=lfs -text
+*.mtl filter=lfs diff=lfs merge=lfs -text
+*.MTL filter=lfs diff=lfs merge=lfs -text
 *.mov filter=lfs diff=lfs merge=lfs -text
 *.MOV filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
 *.MP3 filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 *.MP4 filter=lfs diff=lfs merge=lfs -text
+*.mvn filter=lfs diff=lfs merge=lfs -text
+*.MVN filter=lfs diff=lfs merge=lfs -text
+*.mvnx filter=lfs diff=lfs merge=lfs -text
+*.MVNX filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.OBJ filter=lfs diff=lfs merge=lfs -text
 *.ogg filter=lfs diff=lfs merge=lfs -text
 *.OGG filter=lfs diff=lfs merge=lfs -text
 *.ogv filter=lfs diff=lfs merge=lfs -text
@@ -107,10 +130,22 @@
 *.PKF filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.PNG filter=lfs diff=lfs merge=lfs -text
+*.prproj filter=lfs diff=lfs merge=lfs -text
+*.PRPROJ filter=lfs diff=lfs merge=lfs -text
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.PSD filter=lfs diff=lfs merge=lfs -text
+*.pur filter=lfs diff=lfs merge=lfs -text
+*.PUR filter=lfs diff=lfs merge=lfs -text
+*.sgt filter=lfs diff=lfs merge=lfs -text
+*.SGT filter=lfs diff=lfs merge=lfs -text
+*.sknr filter=lfs diff=lfs merge=lfs -text
+*.SKNR filter=lfs diff=lfs merge=lfs -text
+*.skp filter=lfs diff=lfs merge=lfs -text
+*.SKP filter=lfs diff=lfs merge=lfs -text
 *.so filter=lfs diff=lfs merge=lfs -text
 *.SO filter=lfs diff=lfs merge=lfs -text
+*.spm filter=lfs diff=lfs merge=lfs -text
+*.SPM filter=lfs diff=lfs merge=lfs -text
 *.svg filter=lfs diff=lfs merge=lfs -text
 *.SVG filter=lfs diff=lfs merge=lfs -text
 *.tga filter=lfs diff=lfs merge=lfs -text
@@ -133,6 +168,10 @@
 *.UMAP filter=lfs diff=lfs merge=lfs -text
 *.unitypackage filter=lfs diff=lfs merge=lfs -text
 *.UNITYPACKAGE filter=lfs diff=lfs merge=lfs -text
+*.usd filter=lfs diff=lfs merge=lfs -text
+*.USD filter=lfs diff=lfs merge=lfs -text
+*.usda filter=lfs diff=lfs merge=lfs -text
+*.USDA filter=lfs diff=lfs merge=lfs -text
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.WAV filter=lfs diff=lfs merge=lfs -text
 *.webm filter=lfs diff=lfs merge=lfs -text
@@ -149,3 +188,9 @@
 *.XLSX filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.ZIP filter=lfs diff=lfs merge=lfs -text
+*.zpr filter=lfs diff=lfs merge=lfs -text
+*.ZPR filter=lfs diff=lfs merge=lfs -text
+*.zt filter=lfs diff=lfs merge=lfs -text
+*.ZT filter=lfs diff=lfs merge=lfs -text
+*.ztl filter=lfs diff=lfs merge=lfs -text
+*.ZTL filter=lfs diff=lfs merge=lfs -text
