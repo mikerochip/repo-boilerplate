@@ -24,3 +24,7 @@ indent_style = space
 # Windows batch files
 [*.{bat,cmd}]
 end_of_line = crlf
+
+# Terraform
+[*.{tf,tfbackend,tfvars,tf.json,tfvars.json,tftest.hcl,tftest.json}]
+indent_size = 2
