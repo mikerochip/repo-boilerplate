@@ -1,10 +1,11 @@
 #!/bin/sh
-command -v pwsh >/dev/null 2>&1 || { echo >&2 "\npwsh was not found on your path. Install PowerShell first.\n"; exit 2; }
+command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\n'git-lfs' was not found on your path. Install Git LFS first.\n"; exit 2; }
+command -v pwsh >/dev/null 2>&1 || { echo >&2 "\n'pwsh' was not found on your path. Install PowerShell first.\n"; exit 2; }
+
 pwsh ProjectTools/GitHooks/CheckMetaFiles.ps1 -UnityProjectPath "ProjectUnity/"
 ret=$?
 if [ $ret -ne 0 ]; then
     exit $ret
 fi
 
-command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\nThis repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting '.git/hooks/pre-push'.\n"; exit 2; }
 git lfs pre-push "$@"
