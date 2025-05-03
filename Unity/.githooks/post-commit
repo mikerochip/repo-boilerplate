@@ -2,5 +2,6 @@
 set -e
 
 command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\n'git-lfs' was not found on your path. Install Git LFS first.\n"; exit 2; }
+source ProjectTools/GitHooks/install-pwsh.sh
 
 git lfs post-commit "$@"
