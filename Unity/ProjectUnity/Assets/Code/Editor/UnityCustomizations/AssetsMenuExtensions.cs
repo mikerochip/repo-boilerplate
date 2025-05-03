@@ -1,7 +1,9 @@
 using System.IO;
 using System.Text;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Company.ProjectUnity.Editor.UnityCustomizations
 {
