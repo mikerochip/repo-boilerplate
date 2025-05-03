@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
                     @"~/.config/unity3d",
                 RuntimePlatform.OSXEditor =>
                     @"~/Library/Logs/Unity",
-                RuntimePlatform.WindowsEditor => System.Environment.ExpandEnvironmentVariables(
+                RuntimePlatform.WindowsEditor => Environment.ExpandEnvironmentVariables(
                     @"%LOCALAPPDATA%\Unity\Editor"),
                 _ => throw new NotImplementedException($"Unknown Editor Logs folder for {Application.platform}"),
             };
@@ -47,7 +48,7 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
                     @$"~/.config/unity3d/{Application.companyName}/{Application.productName}/Player.log",
                 RuntimePlatform.OSXEditor =>
                     @$"~/Library/Logs/{Application.companyName}/{Application.productName}/Player.log",
-                RuntimePlatform.WindowsEditor => System.Environment.ExpandEnvironmentVariables(
+                RuntimePlatform.WindowsEditor => Environment.ExpandEnvironmentVariables(
                     @$"%USERPROFILE%\AppData\LocalLow\{Application.companyName}\{Application.productName}\Player.log"),
                 _ => throw new NotImplementedException($"Unknown Player Logs folder for {Application.platform}"),
             };
@@ -64,7 +65,7 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
                     @"~/.config/UnityHub/logs/Player.log",
                 RuntimePlatform.OSXEditor =>
                     @"~/Library/Application Support/UnityHub/logs/info-log.json",
-                RuntimePlatform.WindowsEditor => System.Environment.ExpandEnvironmentVariables(
+                RuntimePlatform.WindowsEditor => Environment.ExpandEnvironmentVariables(
                     @"%USERPROFILE%\AppData\Roaming\UnityHub\logs\info-log.json"),
                 _ => throw new NotImplementedException($"Unknown Hub Logs folder for {Application.platform}"),
             };
@@ -81,17 +82,22 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
                     @"~/.config/unity3d/cache",
                 RuntimePlatform.OSXEditor =>
                     @"~/Library/Unity/cache",
-                RuntimePlatform.WindowsEditor => System.Environment.ExpandEnvironmentVariables(GetWindowsPath()),
+                RuntimePlatform.WindowsEditor => Environment.ExpandEnvironmentVariables(GetWindowsPath()),
                 _ => throw new NotImplementedException($"Unknown UPM global cache folder for {Application.platform}"),
             };
             EditorUtility.RevealInFinder(dirPath);
+            return;
 
             string GetWindowsPath()
             {
+#if UNITY_EDITOR_WIN
                 using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
                 return identity.IsSystem
                     ? @"%ALLUSERSPROFILE%\Unity\cache"
                     : @"%LOCALAPPDATA%\Unity\cache";
+#else
+                return @"%LOCALAPPDATA%\Unity\cache";
+#endif
             }
         }
 
@@ -105,7 +111,7 @@ namespace Company.ProjectUnity.Editor.UnityCustomizations
                     @"~/.local/share/unity3d/Asset Store-5.x",
                 RuntimePlatform.OSXEditor =>
                     @"~/Library/Unity/Asset Store-5.x",
-                RuntimePlatform.WindowsEditor => System.Environment.ExpandEnvironmentVariables(
+                RuntimePlatform.WindowsEditor => Environment.ExpandEnvironmentVariables(
                     @"%APPDATA%\Unity\Asset Store-5.x"),
                 _ => throw new NotImplementedException($"Unknown Asset Store cache folder for {Application.platform}"),
             };
