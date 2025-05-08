@@ -18,7 +18,7 @@ trim_trailing_whitespace = false
 indent_size = 2
 
 # Shell scripts
-[*.{sh,bash,zsh,ps1,psm1}]
+[*.{command,sh,bash,zsh,ps1,psm1}]
 indent_style = space
 
 # Windows batch files
