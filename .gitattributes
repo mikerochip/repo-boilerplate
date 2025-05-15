@@ -1,10 +1,10 @@
 # let git try to figure out what's text
-*                   text=auto eol=lf
+*                   text=auto
 
 # git dotfiles
-*.gitattributes     text eol=lf
-*.gitignore         text eol=lf
-*.gitmodules        text eol=lf
+*.gitattributes     text
+*.gitignore         text
+*.gitmodules        text
 
 # linux and mac
 *.command           text eol=lf
