@@ -2,7 +2,7 @@
 set -e
 
 command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\n'git-lfs' was not found on your path. Install Git LFS first.\n"; exit 2; }
-source ProjectTools/GitHooks/install-pwsh.sh
+command -v pwsh >/dev/null 2>&1 || { echo >&2 "\n'pwsh' was not found on your path. Install PowerShell first.\n"; exit 2; }
 
 pwsh ProjectTools/GitHooks/CheckMetaFiles.ps1 -UnityProjectPath "ProjectUnity/"
 ret=$?
