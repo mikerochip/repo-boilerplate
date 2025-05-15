@@ -5,7 +5,6 @@ root = true
 # Global defaults
 [*]
 charset = utf-8
-end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space
@@ -19,7 +18,7 @@ indent_size = 2
 
 # Shell scripts
 [*.{command,sh,bash,zsh,ps1,psm1}]
-indent_style = space
+end_of_line = lf
 
 # Windows batch files
 [*.{bat,cmd}]
