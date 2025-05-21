@@ -25,5 +25,5 @@ end_of_line = lf
 end_of_line = crlf
 
 # Terraform
-[*.{tf,tfbackend,tfvars,tf.json,tfvars.json,tftest.hcl,tftest.json}]
+[*.{tf,hcl,tfvars,tfbackend,tf.json,tfvars.json,tftest.json}]
 indent_size = 2
