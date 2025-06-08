@@ -19,13 +19,7 @@ function Get-ItemName([string]$path) {
 }
 
 function Test-GitTracked([string]$path) {
-    if ((Test-Path $path -PathType Leaf) -and $gitFileTable.Contains($path)) {
-        return $true
-    }
-    if ((Test-Path $path -PathType Container) -and $gitFolderTable.Contains($path)) {
-        return $true
-    }
-    return $false
+    return $gitFileTable.Contains($path) -or $gitFolderTable.Contains($path)
 }
 
 $indent = [System.Text.StringBuilder]::new()
@@ -33,14 +27,19 @@ $indent = [System.Text.StringBuilder]::new()
 function Test-MetaFiles($path) {
     $null = $indent.Insert(0, "  ")
 
-    Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
+    # Get all items at once to minimize file system calls
+    $allItems = Get-ChildItem -LiteralPath $path -Force -Recurse
 
-    $checkDirPaths = New-Object System.Collections.Generic.List[string]
+    # Create lookup tables for faster access
+    $filesByFullPath = New-Object System.Collections.Generic.List[string]
+    $foldersByFullPath = New-Object System.Collections.Generic.List[string]
 
-    $items = Get-ChildItem $path -Force
-    foreach ($item in $items) {
-        Write-Verbose "$($indent)Check `"$($item.Name)`""
+    # First pass: Build lookup tables and filter to just files and folders
+    # that need to be checked for matching meta files
+    Write-Verbose "$($indent)First pass: Filter items that need meta files"
+    $null = $indent.Insert(0, "  ")
 
+    foreach ($item in $allItems) {
         $fullPath = $item.FullName
 
         if ([MetaFileHelper]::IsUnityHiddenItem($item)) {
@@ -52,38 +51,60 @@ function Test-MetaFiles($path) {
             continue
         }
 
-        if ($item -like '*.meta') {
-            $companionItemPath = $fullPath -replace '.meta$', ''
-            Write-Verbose "$($indent)Test companion `"$(Get-ItemName($companionItemPath))`""
+        if (Test-Path -LiteralPath $fullPath -PathType Leaf) {
+            Write-Verbose "$($indent)Add file: `"$(Get-RelativePath($fullPath))`""
+            $filesByFullPath.Add($fullPath)
+        }
+        else {
+            Write-Verbose "$($indent)Add folder: `"$(Get-RelativePath($fullPath))`""
+            $foldersByFullPath.Add($fullPath)
+        }
+    }
+
+    $null = $indent.Remove(0, 2)
+
+    # Second pass: Check file table
+    # Two categories:
+    # 1. meta files that should have companion files
+    # 2. files that should have matching .meta files
+    Write-Verbose "$($indent)Second pass: Check files"
+    $null = $indent.Insert(0, "  ")
+
+    foreach ($fullPath in $filesByFullPath) {
+        $isMetaFile = $fullPath -like '*.meta'
+
+        Write-Verbose "$($indent)Check file: `"$(Get-RelativePath($fullPath))`""
+
+        if ($isMetaFile) {
+            $companionItemPath = $fullPath -replace '\.meta$', ''
 
             if ([System.IO.File]::Exists($companionItemPath)) {
-                # is the file source controlled?
                 if (!$gitFileTable.Contains($companionItemPath)) {
                     Write-Host ("File `"$(Get-RelativePath($companionItemPath))`" is not in source control, " +
-                                "but its .meta file is")
+                        "but its .meta file is")
                     if (-not $WhatIfPreference) {
                         exit 1
                     }
                 }
-            } elseif ([System.IO.Directory]::Exists($companionItemPath)) {
-                # does the directory have any source controlled files?
+            }
+            elseif ([System.IO.Directory]::Exists($companionItemPath)) {
                 if (!$gitFolderTable.Contains($companionItemPath)) {
-                    Write-Host ("Folder `"$(Get-RelativePath($companionItemPath))`" has a .meta file " +
-                                "but is empty or has all ignored files.`n" +
-                                "Add a blank file named `".keep`" to keep it.")
+                    Write-Host ("Folder `"$(Get-RelativePath($companionItemPath))`" is not in source control, " +
+                        "but its .meta file is")
                     if (-not $WhatIfPreference) {
                         exit 1
                     }
                 }
-            } else {
-                Write-Host "There is no file or folder for `"$(Get-RelativePath($fullPath))`""
+            }
+            else {
+                Write-Host "There is no companion `"$(Get-RelativePath($companionItemPath))`" for `"$(Get-RelativePath($fullPath))`""
                 if (-not $WhatIfPreference) {
                     exit 1
                 }
             }
-        } else {
+        }
+        else {
             $metaItemPath = $fullPath + '.meta'
-            Write-Verbose "$($indent)Test meta `"$(Get-ItemName($metaItemPath))`""
 
             if (!$gitFileTable.Contains($metaItemPath)) {
                 Write-Host "The .meta file for `"$(Get-RelativePath($fullPath))`" is not in source control"
@@ -92,15 +113,29 @@ function Test-MetaFiles($path) {
                 }
             }
         }
+    }
 
-        if ([MetaFileHelper]::ShouldCheckChildItems($item)) {
-            $checkDirPaths.Add($fullPath)
+    $null = $indent.Remove(0, 2)
+
+    # Third pass: Check folder table
+    Write-Verbose "$($indent)Third pass: Check folders"
+    $null = $indent.Insert(0, "  ")
+
+    foreach ($fullPath in $foldersByFullPath) {
+        Write-Verbose "$($indent)Check folder: `"$(Get-RelativePath($fullPath))`""
+
+        $companionItemPath = $fullPath + '.meta'
+
+        if ([System.IO.File]::Exists($companionItemPath)) {
+            continue
+        }
+
+        Write-Host "The .meta file for `"$(Get-RelativePath($fullPath))`" is not in source control"
+        if (-not $WhatIfPreference) {
+            exit 1
         }
     }
-
-    foreach ($dirPath in $checkDirPaths) {
-        Test-MetaFiles $dirPath
-    }
+    $null = $indent.Remove(0, 2)
 
     $null = $indent.Remove(0, 2)
 }

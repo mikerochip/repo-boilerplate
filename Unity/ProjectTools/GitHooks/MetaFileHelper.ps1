@@ -50,7 +50,7 @@ class MetaFileHelper {
 
     static [string]FindGitPath([string]$path) {
         while ($path) {
-            $gitPath = "$path/.git"
+            $gitPath = Join-Path $path '.git'
             if (Test-Path -LiteralPath $gitPath -PathType Container) {
                 return $gitPath
             }
@@ -76,7 +76,7 @@ class MetaFileHelper {
     but only if they are in the same repo as the Unity project.
     #>
     static [string[]]GetMetaFileFolderPaths([string]$unityProjectPath) {
-        Write-Verbose 'GetMetaFileFolderPaths'
+        Write-Verbose "GetMetaFileFolderPaths"
         Write-Verbose "  unityProjectPath `"$unityProjectPath`""
 
         $projectGitPath = [MetaFileHelper]::FindGitPath($unityProjectPath)
@@ -92,58 +92,55 @@ class MetaFileHelper {
         Write-Verbose "  Add $assetsPath"
         $dirPaths.Add($assetsPath)
 
-        $prevLocation = Get-Location
-        $prevWorkingDirectory = [System.IO.Directory]::GetCurrentDirectory()
+        $packagesPath = Join-Path $unityProjectPath 'Packages'
+        Write-Verbose "  Packages Path: $packagesPath"
 
-        $newWorkingDirectory = [System.IO.Path]::Combine($unityProjectPath, "Packages")
-        Write-Verbose "  Set Dir `"$newWorkingDirectory`""
-        [System.IO.Directory]::SetCurrentDirectory($newWorkingDirectory)
-        Set-Location $newWorkingDirectory
+        if (Test-Path -LiteralPath $packagesPath -PathType Container) {
+            Write-Verbose "  Check Embedded Packages"
+            foreach ($item in Get-ChildItem -LiteralPath $packagesPath -Directory) {
+                $fullPath = $item.FullName
+                Write-Verbose "  Check `"$fullPath`""
 
-        Write-Verbose "  Check Embedded Packages"
-        foreach ($item in Get-ChildItem -Directory) {
-            Write-Verbose "  Check `"$item`""
-            Write-Verbose "    Test `"$item/package.json`""
-            if (Test-Path -LiteralPath "$item/package.json" -PathType Leaf) {
-                Write-Verbose "    Add"
-                $dirPaths.Add($item.FullName)
-            } else {
-                Write-Verbose "    Skip: No `"package.json`""
+                $packageJsonPath = Join-Path $fullPath 'package.json'
+                if (Test-Path -LiteralPath $packageJsonPath -PathType Leaf) {
+                    Write-Verbose "    Add $fullPath"
+                    $dirPaths.Add($fullPath)
+                }
+                else {
+                    Write-Verbose "    Skip: No `"package.json`""
+                }
+            }
+
+            $manifestPath = Join-Path $packagesPath 'manifest.json'
+            if (Test-Path $manifestPath -PathType Leaf) {
+                Write-Verbose "  Check Local Packages"
+                $manifest = Get-Content $manifestPath | ConvertFrom-Json
+                foreach ($property in $manifest.dependencies.PSObject.Properties) {
+                    if ($property.Value -notlike 'file:*') {
+                        continue
+                    }
+
+                    $path = $property.Value -replace '^file:*', ''
+                    $fullPath = [System.IO.Path]::GetFullPath($path, $packagesPath)
+                    Write-Verbose "  Check `"$fullPath`""
+
+                    if ($dirPaths.Contains($fullPath)) {
+                        Write-Verbose "    Skip: Duplicate"
+                        continue
+                    }
+
+                    $dependencyGitPath = [MetaFileHelper]::FindGitPath($fullPath)
+                    Write-Verbose "    GitPath `"$dependencyGitPath`""
+                    if ($projectGitPath -ne $dependencyGitPath) {
+                        Write-Verbose "    Skip: DifferentGitRepo"
+                        continue
+                    }
+
+                    Write-Verbose "    Add $fullPath"
+                    $dirPaths.Add($fullPath)
+                }
             }
         }
-
-        Write-Verbose "  Check Local Packages"
-        $manifest = Get-Content 'manifest.json' | ConvertFrom-Json
-        foreach ($property in $manifest.dependencies.PSObject.Properties) {
-            if ($property.Value -notlike 'file:*') {
-                continue
-            }
-
-            $path = $property.Value -replace '^file:*', ''
-            Write-Verbose "  Check `"$path`""
-
-            $path = [System.IO.Path]::GetFullPath($path)
-            Write-Verbose "    Path `"$path`""
-
-            if ($dirPaths.Contains($path)) {
-                Write-Verbose "    Skip: Duplicate"
-                continue
-            }
-
-            $dependencyGitPath = [MetaFileHelper]::FindGitPath($path)
-            Write-Verbose "    GitPath `"$dependencyGitPath`""
-
-            if ($projectGitPath -ne $dependencyGitPath) {
-                Write-Verbose "    Skip: DifferentGitPath"
-                continue
-            }
-
-            Write-Verbose "    Include"
-            $dirPaths.Add($path)
-        }
-
-        [System.IO.Directory]::SetCurrentDirectory($prevWorkingDirectory)
-        Set-Location $prevLocation
 
         return $dirPaths.ToArray()
     }
@@ -151,16 +148,12 @@ class MetaFileHelper {
     <#
     .SYNOPSIS
     Gather all Git-tracked file and folder full paths from the given directory.
-
     .PARAMETER basePath
     Path to start gathering Git files.
-
     .PARAMETER fileTable
     Will be filled in with all Git files.
-
     .PARAMETER folderTable
     Will be filled in with all parent folders and subfolders of Git files.
-
     .DESCRIPTION
     Runs git ls-files twice - once to catch all files and once more to remove deleted files.
     Uses the result to fill in a table of file full paths and a table of folder full paths.
@@ -172,27 +165,20 @@ class MetaFileHelper {
             throw 'Either "$folderTable" or "$fileTable" must be specified'
         }
 
-        # the PowerShell Location APIs are what commands base their paths on
-        $prevLocation = Get-Location
-        Set-Location $basePath
-
         # We have to specify -z otherwise Git will encode paths with escape sequences for
         # \ and " as well as use octal encoding(!) for Unicode characters. Also, -z means the
         # delimiter becomes the NULL character, and, for whatever reason, we can't combine
         # --format and --others, so we have to convert the output manually.
         # See https://stackoverflow.com/questions/40679814/unescaping-special-characters-in-git-output/40721503#40721503
-        $paths = [MetaFileHelper]::ConvertGitLsResultToArray((git ls-files --others --cached --exclude-standard -z))
-        $deletedPaths = [MetaFileHelper]::ConvertGitLsResultToArray((git ls-files --deleted --exclude-standard -z))
-        $paths = $paths | Where-Object { $PSItem -notin $deletedPaths }
+        $listCmd = "git -C `"$basePath`" ls-files --others --cached --exclude-standard -z"
+        $listDeletedCmd = "git -C `"$basePath`" ls-files --deleted --exclude-standard -z"
+        $paths = [MetaFileHelper]::ConvertGitLsResultToArray((Invoke-Expression $listCmd))
+        $deletedPaths = [MetaFileHelper]::ConvertGitLsResultToArray((Invoke-Expression $listDeletedCmd))
 
-        Set-Location $prevLocation
+        $paths = $paths | Where-Object { $_ -notin $deletedPaths }
 
-        # the .Net APIs affect working directory paths
-        $workingDirectory = [System.IO.Directory]::GetCurrentDirectory()
-        [System.IO.Directory]::SetCurrentDirectory($basePath)
-        for ($i = 0; $i -lt $paths.Length; ++$i) {
-            $path = $paths[$i]
-            $fullPath = [System.IO.Path]::GetFullPath($path)
+        foreach ($path in $paths) {
+            $fullPath = [System.IO.Path]::GetFullPath($path, $basePath)
 
             if ($null -ne $fileTable) {
                 Write-Verbose "  AddFile `"$fullPath`""
@@ -208,6 +194,5 @@ class MetaFileHelper {
                 }
             }
         }
-        [System.IO.Directory]::SetCurrentDirectory($workingDirectory)
     }
 }

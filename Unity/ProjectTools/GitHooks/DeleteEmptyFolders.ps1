@@ -16,47 +16,42 @@ function Get-RelativePath([string]$path) {
 
 $indent = [System.Text.StringBuilder]::new()
 
-function Test-HasGitTrackedItems([string]$fullPath) {
-    Write-Verbose "$($indent)Test-HasGitTrackedItems `"$(Get-RelativePath($fullPath))`""
-    $contains = $gitFolderTable.Contains($fullPath)
-    Write-Verbose "$($indent)  $contains"
-    return $contains
-}
-
-function Remove-EmptyFolder($path) {
+function Remove-EmptyFolders($basePath) {
     $null = $indent.Insert(0, "  ")
 
-    Write-Verbose "$($indent)Get-ChildItem `"$(Get-RelativePath($path))`""
+    # Get all subdirectory paths
+    $allFoldersFullPaths = Get-ChildItem -LiteralPath $basePath -Directory -Recurse -Force
+    $allFoldersFullPaths = $allFoldersFullPaths | ForEach-Object { $_.FullName }
+    # Sort directories by path length descending (i.e. deepest first) so we can safely check
+    # and delete empty subdirs (empty meaning all non-git-tracked content)
+    $allFoldersFullPaths = $allFoldersFullPaths | Sort-Object { $_.Length } -Descending
 
-    $childItems = Get-ChildItem $path
+    foreach ($fullPath in $allFoldersFullPaths) {
+        Write-Verbose "$($indent)Check `"$(Get-RelativePath($fullPath))`""
+        $null = $indent.Insert(0, "  ")
 
-    foreach ($item in $childItems) {
-        Write-Verbose "$($indent)Check `"$($item.Name)`""
-
-        if (-not (Test-Path $item -PathType Container)) {
+        if ($gitFolderTable.Contains($fullPath)) {
+            Write-Verbose "$($indent)Keep `"$(Get-RelativePath($fullPath))`""
+            $null = $indent.Remove(0, 2)
             continue
         }
 
-        $fullPath = $item.FullName
+        Write-Host "$($indent)Remove `"$(Get-RelativePath($fullPath))`""
+        if (-not $WhatIfPreference) {
+            Get-ChildItem -LiteralPath $fullPath -Force | Remove-Item -Force
+            Remove-Item -LiteralPath $fullPath -Force
+        }
 
-        if (Test-HasGitTrackedItems $fullPath) {
-            Remove-EmptyFolder $fullPath
-        } else {
-            # either this folder is empty or only has ignored files, delete it
-            Write-Host "$($indent)Remove `"$(Get-RelativePath($fullPath))`""
+        # Remove meta file for this folder
+        $metaItemPath = $fullPath + '.meta'
+        if (Test-Path -LiteralPath $metaItemPath -PathType Leaf) {
+            Write-Host "$($indent)Remove `"$(Get-RelativePath($metaItemPath))`""
             if (-not $WhatIfPreference) {
-                Get-ChildItem $item.FullName -Recurse -Force | Remove-Item -Recurse -Force
-            }
-
-            # remove meta file for this folder
-            $metaItemPath = $fullPath + '.meta'
-            if (Test-Path -LiteralPath $metaItemPath -PathType Leaf) {
-                Write-Host "$($indent)Remove `"$(Get-RelativePath($metaItemPath))`""
-                if (-not $WhatIfPreference) {
-                    Remove-Item $metaItemPath -Force
-                }
+                Remove-Item -LiteralPath $metaItemPath -Force
             }
         }
+
+        $null = $indent.Remove(0, 2)
     }
 
     $null = $indent.Remove(0, 2)
@@ -74,6 +69,5 @@ foreach ($path in $metaFileFolderPaths) {
 
     $gitFolderTable = @{}
     [MetaFileHelper]::GetGitTrackedFullPaths($path, $null, $gitFolderTable)
-
-    Remove-EmptyFolder $path
+    Remove-EmptyFolders $path
 }
