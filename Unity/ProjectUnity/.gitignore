@@ -13,27 +13,8 @@ obj/
 Logs/
 UserSettings/
 
-# Addressables data generated when building content
-ServerData/
-Assets/StreamingAssets/aa*
-Assets/AddressableAssetsData/link.xml*
-# Addressables generates platform folders directly underneath AddressableAssetsData.
-# All they contain is addressables_content_state.bin but we have to ignore each platform
-# because of meta files.
-Assets/AddressableAssetsData/Unknown*
-Assets/AddressableAssetsData/Windows*
-Assets/AddressableAssetsData/OSX*
-Assets/AddressableAssetsData/Linux*
-Assets/AddressableAssetsData/PS4*
-Assets/AddressableAssetsData/Switch*
-Assets/AddressableAssetsData/XboxOne*
-Assets/AddressableAssetsData/WebGL*
-Assets/AddressableAssetsData/iOS*
-Assets/AddressableAssetsData/Android*
-Assets/AddressableAssetsData/WindowsUniversal*
-
-# Plugins
-Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset*
+# Blender
+.blend1*
 
 # Visual Studio
 .vs/
@@ -81,8 +62,33 @@ ExportedObj/
 # Unity3D generated file on crash reports
 sysinfo.txt
 
+# Builds
+*.apk
+*.aab
+*.unitypackage*
+*.app
+.gradle/
+
 # Crashlytics generated file
 crashlytics-build.properties
 
 # TestRunner generated files
 InitTestScene*.unity*
+
+# Addressables data generated when building content
+ServerData/
+Assets/StreamingAssets/aa*
+Assets/AddressableAssetsData/link.xml*
+# By default, Addressables content builds will generate addressables_content_state.bin
+# files in platform-specific subfolders, for example:
+# /Assets/AddressableAssetsData/OSX/addressables_content_state.bin
+/[Aa]ssets/AddressableAssetsData/*/*.bin*
+
+# Visual Scripting auto-generated files
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
+/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+
+# PlayMaker
+Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset*
