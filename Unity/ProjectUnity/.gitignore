@@ -5,9 +5,10 @@
 Thumbs.db
 
 # Root ignorable folders
+bin/
+obj/
 Library/
 Temp/
-obj/
 [Bb]uild/
 [Bb]uilds/
 Logs/
@@ -23,7 +24,6 @@ UserSettings/
 
 # JetBrains Rider
 .idea/
-Assets/Plugins/Editor/JetBrains*
 *.DotSettings.user
 
 # Mono
@@ -82,13 +82,11 @@ Assets/AddressableAssetsData/link.xml*
 # By default, Addressables content builds will generate addressables_content_state.bin
 # files in platform-specific subfolders, for example:
 # /Assets/AddressableAssetsData/OSX/addressables_content_state.bin
-/[Aa]ssets/AddressableAssetsData/*/*.bin*
+Assets/AddressableAssetsData/*/*.bin*
 
 # Visual Scripting auto-generated files
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+Assets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db*
+Assets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers*
 
 # PlayMaker
 Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset*
