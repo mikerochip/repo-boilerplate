@@ -23,6 +23,7 @@ UserSettings/
 .vsconfig/
 
 # JetBrains Rider
+/[Aa]ssets/Plugins/Editor/JetBrains*
 .idea/
 *.DotSettings.user
 
