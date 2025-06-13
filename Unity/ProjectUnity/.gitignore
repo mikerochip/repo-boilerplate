@@ -19,12 +19,10 @@ UserSettings/
 
 # Visual Studio
 .vs/
-.vscode/
 .vsconfig/
 
 # JetBrains Rider
 /[Aa]ssets/Plugins/Editor/JetBrains*
-.idea/
 *.DotSettings.user
 
 # Mono
