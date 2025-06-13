@@ -8,9 +8,6 @@ Thumbs.db
 .vs
 .vsconfig
 
-# VS Code
-.vscode
-
 # JetBrains
 .idea
 *.DotSettings.user
