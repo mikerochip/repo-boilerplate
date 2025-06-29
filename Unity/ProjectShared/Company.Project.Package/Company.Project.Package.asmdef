@@ -1,0 +1,17 @@
+{
+    "name": "Company.Project.PackageName",
+    "rootNamespace": "Company.Project.Package",
+    "references": [
+        "Company.Project.SomePackageName",
+        "Company.Project.OtherPackageName"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
