@@ -1,32 +1,16 @@
-# EditorConfig is awesome: https://EditorConfig.org
+# https://editorconfig.org
 
-# top-most EditorConfig file
-root = true
-
-# general stuff
+# Global defaults
 [*]
 end_of_line = lf
 trim_trailing_whitespace = true
 insert_final_newline = true
 indent_size = 4
 
-# stuff specific to project code
-[*.{cs,js,ts,py,sh,bat,command,ps1,psm1,psd1,axaml,xaml}]
+# Project code
+[*.{cs,js,ts,py,c,cpp,cxx,h,hxx,m,mm}]
 charset = utf-8
 indent_style = space
-
-[*.{json,yml,yaml,toml,ini,config}]
-charset = utf-8
-indent_style = space
-indent_size = 2
-
-# VS project files
-[*.{sln,csproj,fsproj,vbproj,vcxproj,vcproj,dbproj}]
-end_of_line = crlf
-[*.{lsproj,wixproj,modelproj,sqlproj,wmaproj,xproj}]
-end_of_line = crlf
-[*.{booproj,unityproj,props,filters,vcxitems}]
-end_of_line = crlf
 
 # "Ignore" Unity text-based assets
 # See https://github.com/editorconfig/editorconfig/issues/228
@@ -37,3 +21,33 @@ insert_final_newline = unset
 trim_trailing_whitespace = unset
 indent_style = unset
 indent_size = unset
+
+# Markdown, config files
+[*.{md,yml,yaml,json,ini,config}]
+indent_size = 2
+
+# Shell scripts
+[*.{command,sh,bash,zsh,ps1,psm1,psd1}]
+indent_style = space
+
+# Windows scripts
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# MSBuild and VS project files
+[*.{csproj,proj,projitems,shproj,fsproj,target,props}]
+end_of_line = crlf
+[*.{sln,csproj,fsproj,vbproj,vcxproj,vcproj,dbproj}]
+end_of_line = crlf
+[*.{lsproj,wixproj,modelproj,sqlproj,wmaproj,xproj}]
+end_of_line = crlf
+[*.{booproj,unityproj,props,filters,vcxitems}]
+end_of_line = crlf
+
+# XML files
+[*.{config,nuspec,resx,natvis,axaml,xaml}]
+indent_size = 2
+
+# Terraform
+[*.{tf,hcl,tfvars,tfbackend,tf.json,tfvars.json,tftest.json}]
+indent_size = 2
