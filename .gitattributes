@@ -9,6 +9,8 @@
 # linux and mac
 *.command           text eol=lf
 *.sh                text eol=lf
+*.bash              text eol=lf
+*.zsh               text eol=lf
 
 # windows
 *.bat               text eol=crlf
