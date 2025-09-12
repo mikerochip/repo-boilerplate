@@ -9,7 +9,6 @@ Thumbs.db
 .vsconfig
 
 # JetBrains
-.idea
 *.DotSettings.user
 
 # Gradle
