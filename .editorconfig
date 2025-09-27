@@ -11,7 +11,7 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
 
-# Markdown, config files
+# Markdown, config
 [*.{md,yml,yaml,json,ini,config}]
 insert_final_newline = false
 trim_trailing_whitespace = false
@@ -26,7 +26,7 @@ indent_style = space
 [*.{bat,cmd}]
 end_of_line = crlf
 
-# MSBuild and VS project files
+# MSBuild and VS projects
 [*.{csproj,proj,projitems,shproj,fsproj,target,props}]
 end_of_line = crlf
 [*.{sln,csproj,fsproj,vbproj,vcxproj,vcproj,dbproj}]
@@ -36,10 +36,19 @@ end_of_line = crlf
 [*.{booproj,unityproj,props,filters,vcxitems}]
 end_of_line = crlf
 
-# XML files
+# XML
 [*.{config,nuspec,resx,natvis,axaml,xaml}]
 indent_size = 2
 
 # Terraform
 [*.{tf,hcl,tfvars,tfbackend,tf.json,tfvars.json,tftest.json}]
+indent_size = 2
+
+# Python
+[*.{py,pyi,pyx,pxd,pxi,pyw}]
+indent_style = space
+indent_size = 4
+
+# JS/TS
+[*.{js,jsx,ts,tsx}]
 indent_size = 2
