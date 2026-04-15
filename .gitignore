@@ -5,7 +5,7 @@
 Thumbs.db
 
 # AI
-.claude/settings.local.json
+.claude/**/*.local.*
 
 # Visual Studio
 .vs
