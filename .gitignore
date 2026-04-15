@@ -4,6 +4,9 @@
 # Windows
 Thumbs.db
 
+# AI
+.claude/settings.local.json
+
 # Visual Studio
 .vs
 .vsconfig
