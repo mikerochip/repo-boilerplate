@@ -7,6 +7,9 @@ Thumbs.db
 # AI
 .claude/**/*.local.*
 
+# Environment/config
+.env
+
 # Visual Studio
 .vs
 .vsconfig
