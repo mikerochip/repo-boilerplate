@@ -36,12 +36,9 @@
 *.xproj             text eol=crlf
 
 # LFS
-# Notes
-# * git-lfs migrate is SUPER picky about the format of these lines.
-#   The command WON'T think a file is tracked if it isn't formatted
-#   with exactly one space after the extension and before the filter.
-# * Credit for some of these goes to:
-#   https://github.com/believer-oss/ethos/blob/main/birdie/README.md
+# git-lfs migrate is SUPER picky about the format of these lines.
+# The command WON'T think a file is tracked if it isn't formatted
+# with exactly one space after the extension and before the filter.
 *.264 filter=lfs diff=lfs merge=lfs -text
 *.7Z filter=lfs diff=lfs merge=lfs -text
 *.7z filter=lfs diff=lfs merge=lfs -text
